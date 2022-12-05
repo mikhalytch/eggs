@@ -18,7 +18,7 @@ func TestOf(t *testing.T) {
 		require.Equal(t, Name("abc"), *ptr.Of(Name("abc")))
 		require.Equal(t, Name("abc"), *ptr.Of[Name]("abc"))
 	})
-	t.Run("result is a link to a copy", func(t *testing.T) {
+	t.Run("result is a pointer to a copy", func(t *testing.T) {
 		t.Run("even with a pointer", func(t *testing.T) {
 			v := "some value, pointer to which is under test" // string
 			value := &v                                       // *string
