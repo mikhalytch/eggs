@@ -5,7 +5,16 @@
 
 version: 2
 updates:
+
+# update go modules
   - package-ecosystem: "gomod" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
+      interval: "weekly"
+
+# Set update schedule for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      # Check for updates to GitHub Actions every week
       interval: "weekly"
