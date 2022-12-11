@@ -1,11 +1,16 @@
 name: Bump version
 on:
-  push:
+  workflow_run:
+    workflows: ["CI.build-test"]
     branches:
       - master
       - main
+    types:
+      - completed
+
 jobs:
   build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
