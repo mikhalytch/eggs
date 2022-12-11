@@ -40,5 +40,19 @@ func Exists[T any](predicate funcs.Predicate[T]) funcs.Applier[[]T, bool] {
 	}
 }
 
+func Filter[T any](predicate funcs.Predicate[T]) funcs.Applier[[]T, []T] {
+	return func(ts []T) []T {
+		res := make([]T, 0)
+
+		for _, t := range ts {
+			if predicate(t) {
+				res = append(res, t)
+			}
+		}
+
+		return res
+	}
+}
+
 func Head[T any](ts []T) T   { return ts[0] }
 func Tail[T any](ts []T) []T { return ts[1:] }

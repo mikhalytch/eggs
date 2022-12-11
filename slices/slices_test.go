@@ -40,6 +40,12 @@ func TestExists(t *testing.T) {
 	})
 }
 
+func TestFilter(t *testing.T) {
+	require.Equal(t, []int{1, 2}, slices.Filter(func(i int) bool { return i < 3 })([]int{1, 2, 3, 4, 5}))
+	require.Equal(t, []string{"abc", "cde"},
+		slices.Filter(func(i string) bool { return i < "efg" })([]string{"abc", "cde", "efg"}))
+}
+
 func TestHead(t *testing.T) {
 	t.Run("existing elements", func(t *testing.T) {
 		require.Equal(t, 1, slices.Head([]int{1, 2, 3}))
