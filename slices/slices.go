@@ -33,3 +33,6 @@ func Exists[T any](ts []T, predicate funcs.Predicate[T]) bool {
 
 	return false
 }
+
+func Head[T any](ts []T) T   { return ts[0] }
+func Tail[T any](ts []T) []T { return ts[1:] }

@@ -4,10 +4,19 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-func Min[T constraints.Ordered](a, b T) T {
-	if a < b {
-		return a
+func Min[T constraints.Ordered](first T, other ...T) T {
+	min := func(a, b T) T {
+		if a < b {
+			return a
+		}
+
+		return b
 	}
 
-	return b
+	res := first
+	for _, _b := range other {
+		res = min(res, _b)
+	}
+
+	return res
 }

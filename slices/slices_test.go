@@ -39,3 +39,27 @@ func TestExists(t *testing.T) {
 		require.False(t, slices.Exists([]int{2}, func(a int) bool { return a == 1 }))
 	})
 }
+
+func TestHead(t *testing.T) {
+	t.Run("existing elements", func(t *testing.T) {
+		require.Equal(t, 1, slices.Head([]int{1, 2, 3}))
+		require.Equal(t, "first", slices.Head([]string{"first", "second"}))
+	})
+	t.Run("panics on empty slice", func(t *testing.T) {
+		require.Panics(t, func() { slices.Head([]int{}) })
+		require.Panics(t, func() { slices.Head[int](nil) })
+	})
+}
+
+func TestTail(t *testing.T) {
+	t.Run("slice has enough elements", func(t *testing.T) {
+		require.Equal(t, []int{2, 3}, slices.Tail([]int{1, 2, 3}))
+		require.Equal(t, []string{}, slices.Tail([]string{"first"}))
+		require.Equal(t, []string{"second", "third"}, slices.Tail([]string{"first", "second", "third"}))
+	})
+	t.Run("panics on empty slice", func(t *testing.T) {
+		require.Panics(t, func() { slices.Tail([]int{}) })
+		type Name string
+		require.Panics(t, func() { slices.Tail[Name](nil) })
+	})
+}

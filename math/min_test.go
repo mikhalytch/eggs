@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/mikhalytch/eggs/math"
+	"github.com/mikhalytch/eggs/slices"
 )
 
 func TestMin(t *testing.T) {
@@ -37,6 +38,20 @@ func TestMin(t *testing.T) {
 		for i, test := range tests {
 			t.Run(fmt.Sprintf("test %d", i), func(t *testing.T) {
 				got := math.Min(test.a, test.b)
+				require.Equal(t, test.want, got)
+			})
+		}
+	})
+	t.Run("float with slices", func(t *testing.T) {
+		tests := []struct {
+			elems []float32
+			want  float32
+		}{
+			{[]float32{0.1, 2, 3, 4, 2.3, 5.6}, 0.1},
+		}
+		for i, test := range tests {
+			t.Run(fmt.Sprintf("test %d", i), func(t *testing.T) {
+				got := math.Min(slices.Head(test.elems), slices.Tail(test.elems)...)
 				require.Equal(t, test.want, got)
 			})
 		}
