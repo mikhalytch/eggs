@@ -8,4 +8,4 @@ type (
 	OptMapper[A any, B any] Applier[A, *B]
 )
 
-func (f Applier[T, R]) Apply(t T) R { return f() }
+func (f Applier[T, R]) Apply(t T) R { return f(t) }
