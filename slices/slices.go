@@ -4,34 +4,40 @@ import (
 	"github.com/mikhalytch/eggs/funcs"
 )
 
-func Map[V any, V1 any](vs []V, mapper funcs.Mapper[V, V1]) []V1 {
-	res := make([]V1, 0, len(vs))
+func Map[V any, V1 any](mapper funcs.Mapper[V, V1]) funcs.Applier[[]V, []V1] {
+	return func(vs []V) []V1 {
+		res := make([]V1, 0, len(vs))
 
-	for _, v := range vs {
-		res = append(res, mapper(v))
-	}
-
-	return res
-}
-
-func ToMapWithValues[K comparable, V any](ks []K, valueGenerator func(i int, k K) V) map[K]V {
-	res := make(map[K]V, len(ks))
-
-	for i, k := range ks {
-		res[k] = valueGenerator(i, k)
-	}
-
-	return res
-}
-
-func Exists[T any](ts []T, predicate funcs.Predicate[T]) bool {
-	for _, t := range ts {
-		if predicate(t) {
-			return true
+		for _, v := range vs {
+			res = append(res, mapper(v))
 		}
-	}
 
-	return false
+		return res
+	}
+}
+
+func ToMapWithValues[K comparable, V any](valueGenerator func(i int, k K) V) funcs.Applier[[]K, map[K]V] {
+	return func(ks []K) map[K]V {
+		res := make(map[K]V, len(ks))
+
+		for i, k := range ks {
+			res[k] = valueGenerator(i, k)
+		}
+
+		return res
+	}
+}
+
+func Exists[T any](predicate funcs.Predicate[T]) funcs.Applier[[]T, bool] {
+	return func(ts []T) bool {
+		for _, t := range ts {
+			if predicate(t) {
+				return true
+			}
+		}
+
+		return false
+	}
 }
 
 func Head[T any](ts []T) T   { return ts[0] }
