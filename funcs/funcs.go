@@ -15,3 +15,4 @@ type (
 )
 
 func (f Applier[T, R]) Apply(t T) R { return f(t) }
+func Panic(a any)                   { panic(a) } // since `panic (built-in) must be called`

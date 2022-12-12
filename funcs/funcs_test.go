@@ -14,3 +14,7 @@ func TestApplier_Apply(t *testing.T) {
 	require.Equal(t, "42", app(42))
 	require.Equal(t, app(42), app.Apply(42))
 }
+
+func TestPanic(t *testing.T) {
+	require.Panics(t, func() { panic("abc") })
+}
