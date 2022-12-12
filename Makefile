@@ -5,7 +5,7 @@ all: build lint test
 build: ; go build ./...
 
 .PHONY: test
-test: ; go test ./...
+test: ; go test -cover ./...
 
-.PHONT: lint
+.PHONY: lint
 lint: ; golangci-lint run
