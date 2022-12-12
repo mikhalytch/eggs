@@ -8,7 +8,7 @@ import (
 
 	"github.com/mikhalytch/eggs/funcs/mapper"
 	"github.com/mikhalytch/eggs/maps/mapkeys"
-	"github.com/mikhalytch/eggs/ptr"
+	"github.com/mikhalytch/eggs/opt"
 	"github.com/mikhalytch/eggs/strconv"
 )
 
@@ -28,12 +28,12 @@ func TestFlatMap(t *testing.T) {
 	type ID int
 
 	src := map[ID]string{ID(1): "a", ID(2): "b"}
-	optMapper := func(i ID) *string {
+	optMapper := func(i ID) opt.Option[string] {
 		if i == 1 {
-			return nil
+			return opt.None[string]()
 		}
 
-		return ptr.Of(strconv.StoA(i))
+		return opt.Some(strconv.StoA(i))
 	}
 	assert.Equal(t, []string{"2"}, mapkeys.FlatMap(src, optMapper))
 }
