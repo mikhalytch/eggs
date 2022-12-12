@@ -1,11 +1,18 @@
 package funcs
 
 type (
-	Applier[T any, R any] func(T) R
+	Function0[V any]         func() V
+	FallibleFunction0[V any] func() (V, error)
+	Procedure[T any]         func(T)
+	Routine                  func()
+	FallibleRoutine          func() error
 
-	Predicate[T any]        Applier[T, bool]
-	Mapper[A any, B any]    Applier[A, B]
-	OptMapper[A any, B any] Applier[A, *B]
+	Function[T, V any]      func(T) V
+	Predicate[T any]        Function[T, bool]
+	Mapper[A any, B any]    Function[A, B]
+	OptMapper[A any, B any] Function[A, *B]
+
+	Applier[T any, R any] Function[T, R]
 )
 
 func (f Applier[T, R]) Apply(t T) R { return f(t) }

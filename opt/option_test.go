@@ -77,3 +77,17 @@ func TestNone_FlatMap(t *testing.T) {
 		opt.FlatMap[int, string](opt.None[int](),
 			func(i int) opt.Option[string] { return opt.Some(strconv.Itoa(i)) }))
 }
+
+func TestNone_Foreach(t *testing.T) {
+	ctr := 0
+
+	opt.None[string]().Foreach(func(s string) { ctr++ })
+	require.Equal(t, 0, ctr)
+}
+
+func TestSome_Foreach(t *testing.T) {
+	ctr := 0
+
+	opt.Some[string]("abc").Foreach(func(s string) { ctr++ })
+	require.Equal(t, 1, ctr)
+}
