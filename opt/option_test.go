@@ -48,6 +48,25 @@ func TestOrElse(t *testing.T) {
 	require.Equal(t, 1, opt.None[int]().OrElse(1))
 }
 
+func TestNone_OrDefault(t *testing.T) {
+	require.Equal(t, "", opt.None[string]().OrDefault())
+	require.Equal(t, 0.0, opt.None[float64]().OrDefault())
+	require.Equal(t, float32(0.0), opt.None[float32]().OrDefault())
+
+	type Name struct{ s string }
+
+	require.Equal(t, Name{s: ""}, opt.None[Name]().OrDefault())
+}
+
+func TestSome_OrDefault(t *testing.T) {
+	require.Equal(t, "abc", opt.Some("abc").OrDefault())
+	require.Equal(t, 42.1, opt.Some(42.1).OrDefault())
+
+	type Name struct{ s string }
+
+	require.Equal(t, Name{"eggs"}, opt.Some(Name{s: "eggs"}).OrDefault())
+}
+
 func TestFilter(t *testing.T) {
 	require.Equal(t, opt.None[int](), opt.Some(1).Filter(func(i int) bool { return i > 1 }))
 	require.Equal(t, opt.None[int](), opt.Some(1).Filter(predicate.Never[int]))

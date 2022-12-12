@@ -18,6 +18,7 @@ type (
 		IsEmpty() bool
 		Get() (T, error)
 		OrElse(other T) T
+		OrDefault() T
 		ToSlice() []T
 		Filter(p funcs.Predicate[T]) Option[T]
 		Foreach(p funcs.Procedure[T]) Option[T]
@@ -52,6 +53,7 @@ func (n none[T]) IsDefined() bool                        { return false }
 func (n none[T]) IsEmpty() bool                          { return !n.IsDefined() }
 func (n none[T]) Get() (T, error)                        { return deref.Of(new(T)), ErrNoneGet }
 func (n none[T]) OrElse(other T) T                       { return other }
+func (n none[T]) OrDefault() T                           { return deref.OrDefault(new(T)) }
 func (n none[T]) ToSlice() []T                           { return []T{} }
 func (n none[T]) Filter(_ funcs.Predicate[T]) Option[T]  { return n }
 func (n none[T]) Map(m funcs.Mapper[T, T]) Option[T]     { return Map[T, T](n, m) }
@@ -64,6 +66,7 @@ func (s some[T]) IsDefined() bool { return true }
 func (s some[T]) IsEmpty() bool   { return !s.IsDefined() }
 func (s some[T]) Get() (T, error) { return s.t, nil }
 func (s some[T]) OrElse(_ T) T    { return s.t }
+func (s some[T]) OrDefault() T    { return s.t }
 func (s some[T]) ToSlice() []T    { return []T{s.t} }
 func (s some[T]) Filter(p funcs.Predicate[T]) Option[T] {
 	if p(s.t) {
