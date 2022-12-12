@@ -1,4 +1,4 @@
-name: CI.build-test
+name: CI.build-test-lint
 on:
   push:
     tags:
@@ -14,9 +14,10 @@ permissions:
   contents: read
 
 jobs:
-  build-test:
+  build-test-lint:
     permissions:
       contents: read  # for actions/checkout to fetch code
+      pull-requests: read  # for golangci/golangci-lint-action to fetch pull requests
     name: Build
     runs-on: ubuntu-latest
     steps:
@@ -30,12 +31,6 @@ jobs:
         run: make build
       - name: Test
         run: make test
-  lint:
-    permissions:
-      pull-requests: read  # for golangci/golangci-lint-action to fetch pull requests
-    name: Linter
-    runs-on: ubuntu-latest
-    steps:
       - name: Install golangci-lint
         run: |
           curl -sSLO https://github.com/golangci/golangci-lint/releases/download/v$GOLANGCI_LINT_VERSION/golangci-lint-$GOLANGCI_LINT_VERSION-linux-amd64.tar.gz
@@ -46,3 +41,5 @@ jobs:
         env:
           GOLANGCI_LINT_VERSION: '1.50.1'
           GOLANGCI_LINT_SHA256: '4ba1dc9dbdf05b7bdc6f0e04bdfe6f63aa70576f51817be1b2540bbce017b69a'
+      - name: Lint
+        run: make lint
