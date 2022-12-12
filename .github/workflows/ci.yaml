@@ -31,6 +31,8 @@ jobs:
         run: make build
       - name: Test
         run: make test
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
       - name: Install golangci-lint
         run: |
           curl -sSLO https://github.com/golangci/golangci-lint/releases/download/v$GOLANGCI_LINT_VERSION/golangci-lint-$GOLANGCI_LINT_VERSION-linux-amd64.tar.gz

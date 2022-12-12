@@ -9,13 +9,15 @@ import (
 	"github.com/mikhalytch/eggs/tuple"
 )
 
-func TestSwap(t *testing.T) {
+func TestTuple_Swap(t *testing.T) {
 	require.Equal(t, tuple.Of(1, "abc"), tuple.Of("abc", 1).Swap())
 }
-func TestT1(t *testing.T) {
+
+func TestTuple_T1(t *testing.T) {
 	require.Equal(t, 1, tuple.Err(1, nil).T1())
 	require.Equal(t, nil, tuple.FromFallible("abc", nil).Swap().T1())
 }
+
 func TestTuple_T2(t *testing.T) {
 	type Name string
 
