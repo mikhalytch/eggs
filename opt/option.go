@@ -100,3 +100,11 @@ func FlatMap[T, V any](m Option[T], f FMapper[T, V]) Option[V] {
 
 	return None[V]()
 }
+
+func Fold[A, B any](o Option[A], m funcs.Mapper[A, B], f0 funcs.Function0[B]) B {
+	if s, ok := o.(some[A]); ok {
+		return m(s.t)
+	}
+
+	return f0()
+}

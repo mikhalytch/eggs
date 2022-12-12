@@ -9,6 +9,7 @@ import (
 	"github.com/mikhalytch/eggs/funcs/predicate"
 	"github.com/mikhalytch/eggs/opt"
 	"github.com/mikhalytch/eggs/ptr"
+	strconv2 "github.com/mikhalytch/eggs/strconv"
 	"github.com/mikhalytch/eggs/tuple"
 )
 
@@ -109,4 +110,10 @@ func TestSome_Foreach(t *testing.T) {
 
 	opt.Some[string]("abc").Foreach(func(s string) { ctr++ })
 	require.Equal(t, 1, ctr)
+}
+
+func TestFold(t *testing.T) {
+	require.Equal(t, "1", opt.Fold[int, string](opt.Some(1), strconv2.StoA[int], func() string { return "" }))
+	require.Equal(t, "", opt.Fold[int, string](opt.None[int](), strconv2.StoA[int], func() string { return "" }))
+	require.Equal(t, "1", opt.Fold[int, string](opt.None[int](), strconv2.StoA[int], func() string { return "1" }))
 }
