@@ -2,6 +2,7 @@ package slices
 
 import (
 	"github.com/mikhalytch/eggs/funcs"
+	"github.com/mikhalytch/eggs/opt"
 )
 
 func Map[V any, V1 any](mapper funcs.Mapper[V, V1]) funcs.Applier[[]V, []V1] {
@@ -56,3 +57,10 @@ func Filter[T any](predicate funcs.Predicate[T]) funcs.Applier[[]T, []T] {
 
 func Head[T any](ts []T) T   { return ts[0] }
 func Tail[T any](ts []T) []T { return ts[1:] }
+func HeadOpt[T any](ts []T) opt.Option[T] {
+	if len(ts) < 1 {
+		return opt.None[T]()
+	}
+
+	return opt.Some(Head(ts))
+}

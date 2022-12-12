@@ -7,6 +7,7 @@ import (
 
 	"github.com/mikhalytch/eggs/funcs/mapper"
 	"github.com/mikhalytch/eggs/funcs/predicate"
+	"github.com/mikhalytch/eggs/opt"
 	"github.com/mikhalytch/eggs/slices"
 	"github.com/mikhalytch/eggs/strconv"
 )
@@ -68,4 +69,10 @@ func TestTail(t *testing.T) {
 		type Name string
 		require.Panics(t, func() { slices.Tail[Name](nil) })
 	})
+}
+
+func TestHeadOpt(t *testing.T) {
+	require.Equal(t, opt.Some(1), slices.HeadOpt([]int{1, 2}))
+	require.Equal(t, opt.Some("a"), slices.HeadOpt([]string{"a"}))
+	require.Equal(t, opt.None[int](), slices.HeadOpt([]int{}))
 }
