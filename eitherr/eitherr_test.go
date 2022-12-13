@@ -1,6 +1,7 @@
 package eitherr_test
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -71,6 +72,23 @@ func TestMap(t *testing.T) {
 		eitherr.Map(eitherr.FromFallible(fallible()), func(i int) int { return i * 10 }))
 	require.Equal(t, eitherr.Left[int](io.EOF),
 		eitherr.Map(eitherr.FromFallible(fallible()), func(i int) int { return i * 10 }))
+}
+
+func TestMapLeft(t *testing.T) {
+	alw := mapper.Always(http.ErrMissingFile)
+
+	require.Equal(t, eitherr.Right(1), eitherr.Right(1).MapLeft(alw))
+	require.Equal(t, eitherr.Left[int](http.ErrMissingFile), eitherr.Left[int](io.EOF).MapLeft(alw))
+
+	cond := func(e1 error) error {
+		if errors.Is(e1, io.EOF) {
+			return http.ErrAbortHandler
+		}
+
+		return http.ErrBodyNotAllowed
+	}
+	require.Equal(t, eitherr.Left[int](http.ErrAbortHandler), eitherr.Left[int](io.EOF).MapLeft(cond))
+	require.Equal(t, eitherr.Left[int](http.ErrBodyNotAllowed), eitherr.Left[int](http.ErrMissingFile).MapLeft(cond))
 }
 
 func TestLeft_FlatMap(t *testing.T) {

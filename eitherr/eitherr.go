@@ -38,6 +38,7 @@ type (
 
 		// Map is category unchanging method, variant of Map function.
 		Map(mapper funcs.Mapper[R, R]) Eitherr[R]
+		MapLeft(lm funcs.Mapper[error, error]) Eitherr[R]
 
 		// FlatMap is category unchanging method, variant of FlatMap function.
 		FlatMap(fMap FMapper[R, R]) Eitherr[R]
@@ -52,11 +53,12 @@ type (
 
 // ----- right -----
 
-func (r right[R]) OrElse(_ R) R                          { return r.r }
-func (r right[R]) ToErr() error                          { return nil }
-func (r right[R]) ToOpt() opt.Option[R]                  { return opt.Some(r.r) }
-func (r right[R]) Map(m funcs.Mapper[R, R]) Eitherr[R]   { return Map[R, R](r, m) }
-func (r right[R]) FlatMap(fMap FMapper[R, R]) Eitherr[R] { return FlatMap[R, R](r, fMap) }
+func (r right[R]) OrElse(_ R) R                                    { return r.r }
+func (r right[R]) ToErr() error                                    { return nil }
+func (r right[R]) ToOpt() opt.Option[R]                            { return opt.Some(r.r) }
+func (r right[R]) Map(m funcs.Mapper[R, R]) Eitherr[R]             { return Map[R, R](r, m) }
+func (r right[R]) MapLeft(_ funcs.Mapper[error, error]) Eitherr[R] { return r }
+func (r right[R]) FlatMap(fMap FMapper[R, R]) Eitherr[R]           { return FlatMap[R, R](r, fMap) }
 func (r right[R]) ForEach(p funcs.Procedure[R]) Eitherr[R] {
 	p(r.r)
 
@@ -65,12 +67,13 @@ func (r right[R]) ForEach(p funcs.Procedure[R]) Eitherr[R] {
 
 // ----- left -----
 
-func (l left[R]) OrElse(other R) R                        { return other }
-func (l left[R]) ToErr() error                            { return l.err }
-func (l left[R]) ToOpt() opt.Option[R]                    { return opt.None[R]() }
-func (l left[R]) Map(m funcs.Mapper[R, R]) Eitherr[R]     { return Map[R, R](l, m) }
-func (l left[R]) FlatMap(fMap FMapper[R, R]) Eitherr[R]   { return FlatMap[R, R](l, fMap) }
-func (l left[R]) ForEach(_ funcs.Procedure[R]) Eitherr[R] { return l }
+func (l left[R]) OrElse(other R) R                                 { return other }
+func (l left[R]) ToErr() error                                     { return l.err }
+func (l left[R]) ToOpt() opt.Option[R]                             { return opt.None[R]() }
+func (l left[R]) Map(m funcs.Mapper[R, R]) Eitherr[R]              { return Map[R, R](l, m) }
+func (l left[R]) MapLeft(lm funcs.Mapper[error, error]) Eitherr[R] { return Left[R](lm(l.err)) }
+func (l left[R]) FlatMap(fMap FMapper[R, R]) Eitherr[R]            { return FlatMap[R, R](l, fMap) }
+func (l left[R]) ForEach(_ funcs.Procedure[R]) Eitherr[R]          { return l }
 
 // ----- General -----
 
@@ -85,6 +88,7 @@ func FromFallible[R any](r R, err error) Eitherr[R] {
 }
 
 func LiftOption[R any](o opt.Option[R], err error) Eitherr[R] {
+	/*FromFallible(o.Get()).MapLeft(mapper.Always(err))*/
 	return opt.Fold[R, Eitherr[R]](o, Right[R], func() Eitherr[R] { return Left[R](err) })
 }
 
