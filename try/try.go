@@ -9,6 +9,9 @@ type (
 	// Try is like Either, with left type simplified to error
 	// (Basically, Try[T].ToEither() :: Either[error, T]).
 	Try[R any] interface {
+		IsFailure() bool
+		IsSuccess() bool
+
 		// OrElse returns contained value if this is success; otherwise returns given `other` value.
 		OrElse(other R) R
 
@@ -20,6 +23,11 @@ type (
 
 		// ToOpt converts success to opt.Some, failure to opt.None.
 		ToOpt() opt.Option[R]
+
+		// ----- Proc/Map/FlatMap -----
+
+		// Proc does nothing for left; it turns success to failure on proc error
+		Proc(proc funcs.FallibleFunction[R]) Try[R]
 
 		// Map is category unchanging method, variant of Map function.
 		Map(mapper funcs.Mapper[R, R]) Try[R]
@@ -38,9 +46,12 @@ type (
 
 // ----- success -----
 
+func (r success[R]) IsFailure() bool                                { return !r.IsSuccess() }
+func (r success[R]) IsSuccess() bool                                { return true }
 func (r success[R]) OrElse(_ R) R                                   { return r.r }
 func (r success[R]) ToErr() error                                   { return nil }
 func (r success[R]) ToOpt() opt.Option[R]                           { return opt.Some(r.r) }
+func (r success[R]) Proc(proc funcs.FallibleFunction[R]) Try[R]     { return Trie(r.r, proc(r.r)) }
 func (r success[R]) Map(m funcs.Mapper[R, R]) Try[R]                { return Map[R, R](r, m) }
 func (r success[R]) MapFailure(_ funcs.Mapper[error, error]) Try[R] { return r }
 func (r success[R]) FlatMap(fMap FMapper[R, R]) Try[R]              { return FlatMap[R, R](r, fMap) }
@@ -52,9 +63,12 @@ func (r success[R]) ForEach(p funcs.Procedure[R]) Try[R] {
 
 // ----- failure -----
 
+func (l failure[R]) IsFailure() bool                                 { return true }
+func (l failure[R]) IsSuccess() bool                                 { return !l.IsFailure() }
 func (l failure[R]) OrElse(other R) R                                { return other }
 func (l failure[R]) ToErr() error                                    { return l.err }
 func (l failure[R]) ToOpt() opt.Option[R]                            { return opt.None[R]() }
+func (l failure[R]) Proc(_ funcs.FallibleFunction[R]) Try[R]         { return l }
 func (l failure[R]) Map(m funcs.Mapper[R, R]) Try[R]                 { return Map[R, R](l, m) }
 func (l failure[R]) MapFailure(lm funcs.Mapper[error, error]) Try[R] { return Failure[R](lm(l.err)) }
 func (l failure[R]) FlatMap(fMap FMapper[R, R]) Try[R]               { return FlatMap[R, R](l, fMap) }

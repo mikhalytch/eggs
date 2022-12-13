@@ -14,6 +14,16 @@ import (
 	"github.com/mikhalytch/eggs/try"
 )
 
+func TestIsFailure(t *testing.T) {
+	require.True(t, try.Failure[int](io.EOF).IsFailure())
+	require.False(t, try.Success(1).IsFailure())
+}
+
+func TestIsSuccess(t *testing.T) {
+	require.False(t, try.Failure[string](io.EOF).IsSuccess())
+	require.True(t, try.Success("abc").IsSuccess())
+}
+
 func TestFailure_OrElse(t *testing.T) {
 	require.Equal(t, 2, try.LiftOption(opt.None[int](), io.EOF).OrElse(2))
 	require.Equal(t, "abc", try.Failure[string](io.EOF).OrElse("abc"))
@@ -44,6 +54,16 @@ func TestToOpt(t *testing.T) {
 	require.EqualValues(t, opt.None[int](), try.Failure[any](io.EOF).ToOpt())
 	require.Equal(t, opt.None[int](), try.Failure[int](io.EOF).ToOpt())
 	require.Equal(t, opt.Some(10), try.Success(10).ToOpt())
+}
+
+func TestProc(t *testing.T) {
+	f := func(i int) error { return io.EOF }
+	s := func(i int) error { return nil }
+
+	require.Equal(t, try.Failure[int](http.ErrMissingFile), try.Failure[int](http.ErrMissingFile).Proc(f))
+	require.Equal(t, try.Failure[int](http.ErrMissingFile), try.Failure[int](http.ErrMissingFile).Proc(s))
+	require.Equal(t, try.Failure[int](io.EOF), try.Success(1).Proc(f))
+	require.Equal(t, try.Success(1), try.Success(1).Proc(s))
 }
 
 func TestFailure_Map(t *testing.T) {

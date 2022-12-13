@@ -7,9 +7,10 @@ type (
 	Routine                  func()
 	FallibleRoutine          func() error
 
-	Function[T, V any]   func(T) V
-	Predicate[T any]     Function[T, bool]
-	Mapper[A any, B any] Function[A, B]
+	Function[T, V any]      func(T) V
+	Predicate[T any]        Function[T, bool]
+	FallibleFunction[T any] Function[T, error]
+	Mapper[A any, B any]    Function[A, B]
 
 	Applier[T any, R any] Function[T, R]
 )
