@@ -8,6 +8,14 @@ extended [go][1] [generics][2], [scala][3]-like
 
 ---
 
+Things to note: 
+1. computations are not lazy:
+   ```go
+   try.Trie(os.ReadFile("file")). // will execute without any .unsafeRunSync()
+                   Map(bytes.ToLower) 
+   ```
+   it's a long road, but we'll get there
+
 [1]:https://go.dev/
 [2]:https://en.wikipedia.org/wiki/Generic_programming
 [3]:https://scala-lang.org/
