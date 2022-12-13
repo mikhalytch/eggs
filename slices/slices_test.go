@@ -20,22 +20,22 @@ func TestMap(t *testing.T) {
 }
 
 func TestFlatMap(t *testing.T) {
-	singleFMap := slices.FlatMap(func(i int) []int { return []int{i} })
+	singleFMap := slices.FlatMap[int](func(i int) []int { return []int{i} })
 	require.Equal(t, []int{}, singleFMap.Apply([]int{}))
 	require.Equal(t, []int{1, 2}, singleFMap.Apply([]int{1, 2}))
 	require.Equal(t, []int{}, singleFMap.Apply(nil))
 
-	emptyFMap := slices.FlatMap(func(_ int) []int { return []int{} })
+	emptyFMap := slices.FlatMap[int](func(_ int) []int { return []int{} })
 	require.Equal(t, []int{}, emptyFMap.Apply([]int{1, 2, 3}))
 	require.Equal(t, []int{}, emptyFMap.Apply([]int{}))
 	require.Equal(t, []int{}, emptyFMap.Apply(nil))
 
-	nilFMap := slices.FlatMap(func(_ int) []int { return nil })
+	nilFMap := slices.FlatMap[int](func(_ int) []int { return nil })
 	require.Equal(t, []int{}, nilFMap.Apply([]int{1, 2, 3}))
 	require.Equal(t, []int{}, nilFMap.Apply([]int{}))
 	require.Equal(t, []int{}, nilFMap.Apply(nil))
 
-	doubleFMap := slices.FlatMap(func(i string) []string { return []string{i, i} })
+	doubleFMap := slices.FlatMap[string](func(i string) []string { return []string{i, i} })
 	require.Equal(t, []string{}, doubleFMap.Apply([]string{}))
 	require.Equal(t, []string{"a", "a", "bb", "bb"}, doubleFMap.Apply([]string{"a", "bb"}))
 	require.Equal(t, []string{}, doubleFMap.Apply(nil))

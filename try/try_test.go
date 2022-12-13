@@ -14,6 +14,11 @@ import (
 	"github.com/mikhalytch/eggs/try"
 )
 
+func TestIsFailure(t *testing.T) {
+	require.True(t, try.Failure[int](io.EOF).IsFailure())
+	require.False(t, try.Success(1).IsFailure())
+}
+
 func TestIsSuccess(t *testing.T) {
 	require.False(t, try.Failure[string](io.EOF).IsSuccess())
 	require.True(t, try.Success("abc").IsSuccess())

@@ -87,13 +87,15 @@ func TestNone_Map(t *testing.T) {
 func TestSome_FlatMap(t *testing.T) {
 	require.Equal(t, opt.Some("abc"), opt.Some("abc").FlatMap(opt.Some[string]))
 	require.Equal(t, opt.Some("1"),
-		opt.FlatMap(opt.Some(1), func(i int) opt.Option[string] { return opt.Some(strconv.Itoa(i)) }))
+		opt.FlatMap[int, string](opt.Some(1),
+			func(i int) opt.Option[string] { return opt.Some(strconv.Itoa(i)) }))
 }
 
 func TestNone_FlatMap(t *testing.T) {
 	require.Equal(t, opt.None[string](), opt.None[string]().FlatMap(opt.Some[string]))
 	require.Equal(t, opt.None[string](),
-		opt.FlatMap(opt.None[int](), func(i int) opt.Option[string] { return opt.Some(strconv.Itoa(i)) }))
+		opt.FlatMap[int, string](opt.None[int](),
+			func(i int) opt.Option[string] { return opt.Some(strconv.Itoa(i)) }))
 }
 
 func TestNone_Foreach(t *testing.T) {
@@ -111,7 +113,7 @@ func TestSome_Foreach(t *testing.T) {
 }
 
 func TestFold(t *testing.T) {
-	require.Equal(t, "1", opt.Fold(opt.Some(1), strconv2.StoA[int], func() string { return "" }))
-	require.Equal(t, "", opt.Fold(opt.None[int](), strconv2.StoA[int], func() string { return "" }))
-	require.Equal(t, "1", opt.Fold(opt.None[int](), strconv2.StoA[int], func() string { return "1" }))
+	require.Equal(t, "1", opt.Fold[int, string](opt.Some(1), strconv2.StoA[int], func() string { return "" }))
+	require.Equal(t, "", opt.Fold[int, string](opt.None[int](), strconv2.StoA[int], func() string { return "" }))
+	require.Equal(t, "1", opt.Fold[int, string](opt.None[int](), strconv2.StoA[int], func() string { return "1" }))
 }

@@ -9,21 +9,27 @@ type (
 	// Try is like Either, with left type simplified to error
 	// (Basically, Try[T].ToEither() :: Either[error, T]).
 	Try[R any] interface {
+		Is[R]
+		To[R]
+		Monadic[R]
+	}
+	Is[R any] interface {
+		IsFailure() bool
 		IsSuccess() bool
-
-		// OrElse returns contained value if this is success; otherwise returns given `other` value.
-		OrElse(other R) R
-
-		// ForEach executes given procedure for success, skips for failure.
-		ForEach(procedure funcs.Procedure[R]) Try[R]
-
+	}
+	To[R any] interface {
 		// ToErr is nil for success, and error for failure
 		ToErr() error
 
 		// ToOpt converts success to opt.Some, failure to opt.None.
 		ToOpt() opt.Option[R]
+	}
+	Monadic[R any] interface {
+		// OrElse returns contained value if this is success; otherwise returns given `other` value.
+		OrElse(other R) R
 
-		// ----- Proc/Map/FlatMap -----
+		// ForEach executes given procedure for success, skips for failure.
+		ForEach(procedure funcs.Procedure[R]) Try[R]
 
 		// Proc does nothing for left; it turns success to failure on proc error
 		Proc(proc funcs.FallibleFunction[R]) Try[R]
@@ -46,6 +52,7 @@ type (
 
 // ----- success -----
 
+func (r success[R]) IsFailure() bool                                { return !r.IsSuccess() }
 func (r success[R]) IsSuccess() bool                                { return true }
 func (r success[R]) OrElse(_ R) R                                   { return r.r }
 func (r success[R]) ToErr() error                                   { return nil }
@@ -63,7 +70,8 @@ func (r success[R]) ForEach(p funcs.Procedure[R]) Try[R] {
 
 // ----- failure -----
 
-func (l failure[R]) IsSuccess() bool                         { return false }
+func (l failure[R]) IsFailure() bool                         { return true }
+func (l failure[R]) IsSuccess() bool                         { return !l.IsFailure() }
 func (l failure[R]) OrElse(other R) R                        { return other }
 func (l failure[R]) ToErr() error                            { return l.err }
 func (l failure[R]) ToOpt() opt.Option[R]                    { return opt.None[R]() }
