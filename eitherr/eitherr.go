@@ -21,7 +21,7 @@ type (
 			type right[R any] struct { R }
 			type left[R any] struct { error }
 		with all auxiliary functions type signatures became simplified as well.
-		(However, there will be no Swap function)
+		(However, there is no Swap function)
 	*/
 	Eitherr[R any] interface {
 		// OrElse returns contained value if this is right; otherwise returns given `other` value.
