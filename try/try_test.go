@@ -14,11 +14,6 @@ import (
 	"github.com/mikhalytch/eggs/try"
 )
 
-func TestIsFailure(t *testing.T) {
-	require.True(t, try.Failure[int](io.EOF).IsFailure())
-	require.False(t, try.Success(1).IsFailure())
-}
-
 func TestIsSuccess(t *testing.T) {
 	require.False(t, try.Failure[string](io.EOF).IsSuccess())
 	require.True(t, try.Success("abc").IsSuccess())
@@ -64,6 +59,16 @@ func TestProc(t *testing.T) {
 	require.Equal(t, try.Failure[int](http.ErrMissingFile), try.Failure[int](http.ErrMissingFile).Proc(s))
 	require.Equal(t, try.Failure[int](io.EOF), try.Success(1).Proc(f))
 	require.Equal(t, try.Success(1), try.Success(1).Proc(s))
+}
+
+func TestProcFailure(t *testing.T) {
+	cnt := 0
+	f := func(e error) { cnt++ }
+
+	try.Success(1).ProcFailure(f)
+	require.Equal(t, 0, cnt)
+	try.Failure[int](io.EOF).ProcFailure(f)
+	require.Equal(t, 1, cnt)
 }
 
 func TestFailure_Map(t *testing.T) {
