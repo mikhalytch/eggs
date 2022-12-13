@@ -25,7 +25,7 @@ func TestFailure_OrElse(t *testing.T) {
 }
 
 func TestSuccess_OrElse(t *testing.T) {
-	require.Equal(t, 42, try.Success[int](42).OrElse(10))
+	require.Equal(t, 42, try.Success(42).OrElse(10))
 }
 
 func TestForEach(t *testing.T) {
@@ -126,18 +126,18 @@ func TestFailure_FlatMap(t *testing.T) {
 func TestSuccess_FlatMap(t *testing.T) {
 	createFailureInt := func(_ int) try.Try[int] { return try.Failure[int](http.ErrAbortHandler) }
 
-	require.Equal(t, try.Success(1), try.Success[int](1).FlatMap(try.Success[int]))
-	require.Equal(t, try.Failure[int](http.ErrAbortHandler), try.Success[int](1).FlatMap(createFailureInt))
+	require.Equal(t, try.Success(1), try.Success(1).FlatMap(try.Success[int]))
+	require.Equal(t, try.Failure[int](http.ErrAbortHandler), try.Success(1).FlatMap(createFailureInt))
 }
 
 func TestFlatMap(t *testing.T) {
 	createSuccessInt := func(s string) try.Try[int] { return try.Trie(strconv.Atoi(s)) }
 	createFailureString := func(_ int) try.Try[string] { return try.Failure[string](http.ErrAbortHandler) }
 
-	require.Equal(t, try.Success(1), try.FlatMap(try.Success[string]("1"), createSuccessInt))
+	require.Equal(t, try.Success(1), try.FlatMap(try.Success("1"), createSuccessInt))
 	require.Equal(t, try.Failure[int](io.EOF), try.FlatMap(try.Failure[string](io.EOF), createSuccessInt))
 
 	require.Equal(t, try.Failure[string](http.ErrAbortHandler),
-		try.FlatMap(try.Success[int](1), createFailureString))
+		try.FlatMap(try.Success(1), createFailureString))
 	require.Equal(t, try.Failure[int](io.EOF), try.FlatMap(try.Failure[string](io.EOF), createSuccessInt))
 }

@@ -52,9 +52,9 @@ func (r success[R]) ToErr() error                                   { return nil
 func (r success[R]) ToOpt() opt.Option[R]                           { return opt.Some(r.r) }
 func (r success[R]) Proc(proc funcs.FallibleFunction[R]) Try[R]     { return Trie(r.r, proc(r.r)) }
 func (r success[R]) ProcFailure(_ funcs.Procedure[error]) Try[R]    { return r }
-func (r success[R]) Map(m funcs.Mapper[R, R]) Try[R]                { return Map[R, R](r, m) }
+func (r success[R]) Map(m funcs.Mapper[R, R]) Try[R]                { return Map[R](r, m) }
 func (r success[R]) MapFailure(_ funcs.Mapper[error, error]) Try[R] { return r }
-func (r success[R]) FlatMap(fMap FMapper[R, R]) Try[R]              { return FlatMap[R, R](r, fMap) }
+func (r success[R]) FlatMap(fMap FMapper[R, R]) Try[R]              { return FlatMap[R](r, fMap) }
 func (r success[R]) ForEach(p funcs.Procedure[R]) Try[R] {
 	p(r.r)
 
@@ -73,9 +73,9 @@ func (l failure[R]) ProcFailure(proc funcs.Procedure[error]) Try[R] {
 
 	return l
 }
-func (l failure[R]) Map(m funcs.Mapper[R, R]) Try[R]                 { return Map[R, R](l, m) }
+func (l failure[R]) Map(m funcs.Mapper[R, R]) Try[R]                 { return Map[R](l, m) }
 func (l failure[R]) MapFailure(lm funcs.Mapper[error, error]) Try[R] { return Failure[R](lm(l.err)) }
-func (l failure[R]) FlatMap(fMap FMapper[R, R]) Try[R]               { return FlatMap[R, R](l, fMap) }
+func (l failure[R]) FlatMap(fMap FMapper[R, R]) Try[R]               { return FlatMap[R](l, fMap) }
 func (l failure[R]) ForEach(_ funcs.Procedure[R]) Try[R]             { return l }
 
 // ----- General -----
@@ -87,12 +87,12 @@ func Trie[R any](r R, err error) Try[R] {
 		return Failure[R](err)
 	}
 
-	return Success[R](r)
+	return Success(r)
 }
 
 func LiftOption[R any](o opt.Option[R], err error) Try[R] {
 	/*Trie(o.Get()).MapFailure(mapper.Always(err))*/
-	return opt.Fold[R, Try[R]](o, Success[R], func() Try[R] { return Failure[R](err) })
+	return opt.Fold(o, Success[R], func() Try[R] { return Failure[R](err) })
 }
 
 // Map returns success containing the result of applying f to m if it's not failure;

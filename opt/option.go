@@ -56,8 +56,8 @@ func (n none[T]) OrElse(other T) T                       { return other }
 func (n none[T]) OrDefault() T                           { return deref.OrDefault(new(T)) }
 func (n none[T]) ToSlice() []T                           { return []T{} }
 func (n none[T]) Filter(_ funcs.Predicate[T]) Option[T]  { return n }
-func (n none[T]) Map(m funcs.Mapper[T, T]) Option[T]     { return Map[T, T](n, m) }
-func (n none[T]) FlatMap(m FMapper[T, T]) Option[T]      { return FlatMap[T, T](n, m) }
+func (n none[T]) Map(m funcs.Mapper[T, T]) Option[T]     { return Map[T](n, m) }
+func (n none[T]) FlatMap(m FMapper[T, T]) Option[T]      { return FlatMap[T](n, m) }
 func (n none[T]) Foreach(_ funcs.Procedure[T]) Option[T] { return n }
 
 // ----- some -----
@@ -75,8 +75,8 @@ func (s some[T]) Filter(p funcs.Predicate[T]) Option[T] {
 
 	return None[T]()
 }
-func (s some[T]) Map(m funcs.Mapper[T, T]) Option[T] { return Map[T, T](s, m) }
-func (s some[T]) FlatMap(m FMapper[T, T]) Option[T]  { return FlatMap[T, T](s, m) }
+func (s some[T]) Map(m funcs.Mapper[T, T]) Option[T] { return Map[T](s, m) }
+func (s some[T]) FlatMap(m FMapper[T, T]) Option[T]  { return FlatMap[T](s, m) }
 func (s some[T]) Foreach(p funcs.Procedure[T]) Option[T] {
 	p(s.t)
 
@@ -87,7 +87,7 @@ func (s some[T]) Foreach(p funcs.Procedure[T]) Option[T] {
 
 func Map[T, V any](m Option[T], f funcs.Mapper[T, V]) Option[V] {
 	if s, ok := m.(some[T]); ok {
-		return Some[V](f(s.t))
+		return Some(f(s.t))
 	}
 
 	return None[V]()
