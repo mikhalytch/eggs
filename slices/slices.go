@@ -46,9 +46,11 @@ func Join[T any](tss ...[]T) []T {
 	if len(tss) == 0 {
 		return nil
 	}
+
 	res := make([]T, 0)
 	for _, ts := range tss {
 		res = append(res, ts...)
 	}
+
 	return res
 }
