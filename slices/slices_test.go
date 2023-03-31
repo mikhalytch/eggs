@@ -59,3 +59,19 @@ func TestHeadOpt(t *testing.T) {
 	require.Equal(t, opt.Some("a"), slices.HeadOpt([]string{"a"}))
 	require.Equal(t, opt.None[int](), slices.HeadOpt([]int{}))
 }
+
+func TestFlatten(t *testing.T) {
+	t.Run("ints", func(t *testing.T) {
+		require.Equal(t, ([]int)(nil), slices.Flatten[int](nil))
+		require.Equal(t, ([]int)(nil), slices.Flatten[int]([][]int{}))
+		require.Equal(t, []int{1, 2}, slices.Flatten([][]int{{1, 2}}))
+		require.Equal(t, []int{1, 2, 1, 2, 3}, slices.Flatten([][]int{{1, 2}, {1, 2}, {3}}))
+	})
+	t.Run("strings", func(t *testing.T) {
+		require.Equal(t, ([]string)(nil), slices.Flatten[string](nil))
+		require.Equal(t, ([]string)(nil), slices.Flatten[string]([][]string{}))
+		require.Equal(t, []string{"a", "b"}, slices.Flatten([][]string{{"a", "b"}}))
+		require.Equal(t, []string{"a", "b", "a", "b", "abc"},
+			slices.Flatten([][]string{{"a", "b"}, {"a", "b"}, {"abc"}}))
+	})
+}
