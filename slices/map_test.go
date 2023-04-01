@@ -40,9 +40,17 @@ func TestFlatMap(t *testing.T) {
 }
 
 func TestToMapWithValues(t *testing.T) {
-	require.Equal(t, map[string]int{}, slices.ToMapWithValues(func(i int, k string) int { return 0 })([]string{}))
+	require.Equal(t, map[string]int{}, slices.ToMapWithValues(func(k string) int { return 0 })([]string{}))
 	require.Equal(t, map[string]int{"a": 0, "b": 0},
-		slices.ToMapWithValues(func(i int, k string) int { return 0 })([]string{"a", "b"}))
+		slices.ToMapWithValues(func(k string) int { return 0 })([]string{"a", "b"}))
 	require.Equal(t, map[string]int{"a": 0, "b": 1},
-		slices.ToMapWithValues(func(i int, k string) int { return i })([]string{"a", "b"}))
+		slices.ToMapWithValues(func(k string) int { return int(k[0] - 'a') })([]string{"a", "b"}))
+}
+
+func TestToMapWithKeys(t *testing.T) {
+	require.Equal(t, map[string]int{}, slices.ToMapWithKeys(func(v int) string { return "" })([]int{}))
+	require.Equal(t, map[string]int{"a": 1},
+		slices.ToMapWithKeys(func(v int) string { return "a" })([]int{0, 1}))
+	require.Equal(t, map[string]int{"a": 0, "b": 1},
+		slices.ToMapWithKeys(func(v int) string { return string([]byte{byte(v + 'a')}) })([]int{0, 1}))
 }

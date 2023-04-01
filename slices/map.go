@@ -32,12 +32,24 @@ func FlatMap[V, V1 any](fMap FMapper[V, V1]) funcs.Applier[[]V, []V1] {
 	}
 }
 
-func ToMapWithValues[K comparable, V any](valueGenerator func(i int, k K) V) funcs.Applier[[]K, map[K]V] {
+func ToMapWithValues[K comparable, V any](valueGenerator func(k K) V) funcs.Applier[[]K, map[K]V] {
 	return func(ks []K) map[K]V {
 		res := make(map[K]V, len(ks))
 
-		for i, k := range ks {
-			res[k] = valueGenerator(i, k)
+		for _, k := range ks {
+			res[k] = valueGenerator(k)
+		}
+
+		return res
+	}
+}
+
+func ToMapWithKeys[K comparable, V any](keyProducer func(V) K) funcs.Applier[[]V, map[K]V] {
+	return func(vs []V) map[K]V {
+		res := make(map[K]V, 0)
+
+		for _, v := range vs {
+			res[keyProducer(v)] = v
 		}
 
 		return res
