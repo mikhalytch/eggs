@@ -15,6 +15,7 @@ func TestMap(t *testing.T) {
 	require.Equal(t, []int{1, 2, 3}, slices.Map(mapper.Identity[int])([]int{1, 2, 3}))
 	require.Equal(t, []string{}, slices.Map(strconv.StoA[int])([]int{}))
 	require.Equal(t, []string{"1", "2", "2"}, slices.Map(strconv.StoA[int])([]int{1, 2, 2}))
+	require.Equal(t, []any{'a', 'b'}, slices.Map(mapper.ToAny[rune])([]rune{'a', 'b'}))
 }
 
 func TestFlatMap(t *testing.T) {

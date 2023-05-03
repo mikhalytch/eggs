@@ -22,6 +22,11 @@ func TestIdentity(t *testing.T) {
 	require.Equal(t, 1, mapper.Identity(1))
 }
 
+func TestToAny(t *testing.T) {
+	require.Equal(t, "a", mapper.ToAny("a"))
+	require.Equal(t, 1, mapper.ToAny(1))
+}
+
 func TestAlways(t *testing.T) {
 	alw := mapper.Always(5)
 
