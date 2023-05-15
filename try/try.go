@@ -31,12 +31,11 @@ type (
 	Monadic[R any] interface {
 		// GetOrElse returns contained value if this is success; otherwise returns given `other` value.
 		GetOrElse(other R) R
-		LazySupport[R]
-	}
-	LazySupport[R any] interface {
 		// ForEach executes given procedure for success, skips for failure.
 		ForEach(procedure funcs.Procedure[R]) Try[R]
-
+		Functional[R]
+	}
+	Functional[R any] interface {
 		// Proc does nothing for left; it turns success to failure on proc error
 		Proc(proc funcs.FallibleFunction[R]) Try[R]
 		ProcFailure(proc funcs.Procedure[error]) Try[R]
@@ -108,9 +107,7 @@ func (l lazy[R]) ToErr() error         { return l.delayed.Value().ToErr() }
 func (l lazy[R]) ToOpt() opt.Option[R] { return l.delayed.Value().ToOpt() }
 func (l lazy[R]) GetOrElse(other R) R  { return l.delayed.Value().GetOrElse(other) }
 func (l lazy[R]) ForEach(procedure funcs.Procedure[R]) Try[R] {
-	return Lazy(func() (R, error) {
-		return l.delayed.Value().ForEach(procedure).Get()
-	})
+	return l.delayed.Value().ForEach(procedure)
 }
 
 func (l lazy[R]) Proc(proc funcs.FallibleFunction[R]) Try[R] {
@@ -139,8 +136,9 @@ func (l lazy[R]) Get() (R, error)                   { return l.delayed.Value().G
 
 // ----- General -----
 
-func Success[R any](r R) Try[R]         { return success[R]{r: r} }
-func Failure[R any](err error) Try[R]   { return failure[R]{err: err} }
+func Success[R any](r R) Try[R]       { return success[R]{r: r} }
+func Failure[R any](err error) Try[R] { return failure[R]{err: err} }
+
 func From[R any](r R, err error) Try[R] { return Trie(r, err) } // alias to Trie
 func Trie[R any](r R, err error) Try[R] {
 	if err != nil {

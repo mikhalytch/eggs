@@ -46,6 +46,12 @@ func TestFailure_Get(t *testing.T) {
 	require.ErrorIs(t, err, io.EOF)
 }
 
+func TestLazy_Get(t *testing.T) {
+	r, err := try.Lazy[string](func() (string, error) { return "", io.EOF }).Get()
+	require.Equal(t, "", r)
+	require.ErrorIs(t, err, io.EOF)
+}
+
 func TestSuccess_GetOrElse(t *testing.T) {
 	require.Equal(t, 42, try.Success(42).GetOrElse(10))
 }
@@ -57,14 +63,24 @@ func TestSuccess_Get(t *testing.T) {
 }
 
 func TestForEach(t *testing.T) {
-	cnt := 0
-	inc := func(i any) { cnt++ }
+	tests := []struct {
+		success, failure try.Try[any]
+	}{
+		{try.Success[any]("10"), try.Failure[any](io.EOF)},
+		{try.Lazy[any](func() (any, error) { return "10", nil }), try.Lazy[any](func() (any, error) { return "", io.EOF })},
+	}
+	for i, test := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			cnt := 0
+			inc := func(i any) { cnt++ }
 
-	try.Failure[any](io.EOF).ForEach(inc)
-	require.Equal(t, 0, cnt)
+			test.failure.ForEach(inc)
+			require.Equal(t, 0, cnt)
 
-	try.Success[any]("10").ForEach(inc)
-	require.Equal(t, 1, cnt)
+			test.success.ForEach(inc)
+			require.Equal(t, 1, cnt)
+		})
+	}
 }
 
 func TestToErr(t *testing.T) {
