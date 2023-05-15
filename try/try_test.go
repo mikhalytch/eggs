@@ -135,26 +135,107 @@ func TestMapFailure(t *testing.T) {
 
 func TestFailure_FlatMap(t *testing.T) {
 	createFailureInt := func(_ int) try.Try[int] { return try.Failure[int](http.ErrAbortHandler) }
+	tests := []struct {
+		newFailure func() try.Try[int]
+	}{
+		{func() try.Try[int] { return try.Failure[int](io.EOF) }},
+		{func() try.Try[int] { return try.Lazy(func() (int, error) { return 0, io.EOF }) }},
+	}
+	for i, test := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			_, err := test.newFailure().FlatMap(try.Success[int]).Get()
+			require.ErrorIs(t, err, io.EOF)
 
-	require.Equal(t, try.Failure[int](io.EOF), try.Failure[int](io.EOF).FlatMap(try.Success[int]))
-	require.Equal(t, try.Failure[int](io.EOF), try.Failure[int](io.EOF).FlatMap(createFailureInt))
+			_, err = test.newFailure().FlatMap(createFailureInt).Get()
+			require.ErrorIs(t, err, io.EOF)
+		})
+	}
 }
 
 func TestSuccess_FlatMap(t *testing.T) {
 	createFailureInt := func(_ int) try.Try[int] { return try.Failure[int](http.ErrAbortHandler) }
 
-	require.Equal(t, try.Success(1), try.Success(1).FlatMap(try.Success[int]))
-	require.Equal(t, try.Failure[int](http.ErrAbortHandler), try.Success(1).FlatMap(createFailureInt))
+	tests := []struct {
+		newSuccess func() try.Try[int]
+	}{
+		{func() try.Try[int] { return try.Success(1) }},
+		{func() try.Try[int] { return try.Lazy[int](func() (int, error) { return 1, nil }) }},
+	}
+	for i, test := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			f1, err := test.newSuccess().FlatMap(try.Success[int]).Get()
+			require.NoError(t, err)
+			require.Equal(t, 1, f1)
+
+			_, err = test.newSuccess().FlatMap(createFailureInt).Get()
+			require.ErrorIs(t, err, http.ErrAbortHandler)
+		})
+	}
+
 }
 
 func TestFlatMap(t *testing.T) {
 	createSuccessInt := func(s string) try.Try[int] { return try.Trie(strconv.Atoi(s)) }
 	createFailureString := func(_ int) try.Try[string] { return try.Failure[string](http.ErrAbortHandler) }
+	t.Run("simple calc", func(t *testing.T) {
+		scss, err := try.FlatMap(try.Success("1"), createSuccessInt).Get()
+		require.NoError(t, err)
+		require.Equal(t, 1, scss)
 
-	require.Equal(t, try.Success(1), try.FlatMap(try.Success("1"), createSuccessInt))
-	require.Equal(t, try.Failure[int](io.EOF), try.FlatMap(try.Failure[string](io.EOF), createSuccessInt))
+		_, err = try.FlatMap(try.Failure[string](io.EOF), createSuccessInt).Get()
+		require.ErrorIs(t, err, io.EOF)
 
-	require.Equal(t, try.Failure[string](http.ErrAbortHandler),
-		try.FlatMap(try.Success(1), createFailureString))
-	require.Equal(t, try.Failure[int](io.EOF), try.FlatMap(try.Failure[string](io.EOF), createSuccessInt))
+		_, err = try.FlatMap(try.Success(1), createFailureString).Get()
+		require.ErrorIs(t, err, http.ErrAbortHandler)
+
+		_, err = try.FlatMap(try.Failure[string](io.EOF), createSuccessInt).Get()
+		require.ErrorIs(t, err, io.EOF)
+	})
+	t.Run("lazy calc", func(t *testing.T) {
+		fm := try.FlatMap(try.Failure[string](io.EOF), func(r string) try.Try[int] { panic("") })
+		_, err := fm.Get()
+		require.ErrorIs(t, err, io.EOF)
+	})
+}
+
+func TestLazy_Laziness(t *testing.T) {
+	lazy := try.Lazy(func() (any, error) {
+		panic("do")
+	})
+
+	lazy.Map(func(a any) any {
+		return a
+	})
+
+	require.Panics(t, func() {
+		lazy.IsFailure()
+	})
+}
+
+func TestLazy_StackDepth(t *testing.T) {
+	const testedDepth = 1_000_000
+
+	createLazy := func() try.Try[int] {
+		lazy := try.Lazy(func() (int, error) {
+			return 0, nil
+		})
+
+		for i := 0; i < testedDepth; i++ {
+			lazy = lazy.Map(func(i int) int {
+				return i + 1
+			})
+		}
+
+		lazy = lazy.Map(func(i int) int { return i * 2 })
+
+		return lazy
+	}
+	t.Run("uncalled", func(t *testing.T) {
+		createLazy()
+	})
+	t.Run("called", func(t *testing.T) {
+		res, err := createLazy().Get()
+		require.NoError(t, err)
+		require.Equal(t, testedDepth*2, res)
+	})
 }

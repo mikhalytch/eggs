@@ -1,6 +1,8 @@
 package try
 
 import (
+	goLazy "github.com/hymkor/go-lazy"
+
 	"github.com/mikhalytch/eggs/deref"
 	"github.com/mikhalytch/eggs/funcs"
 	"github.com/mikhalytch/eggs/opt"
@@ -8,7 +10,7 @@ import (
 
 type (
 	// Try is like Either, with left type simplified to error
-	// (Basically, Try[T].ToEither() :: Either[error, T]).
+	// (i.e. Try[T].ToEither() === Either[error, T]).
 	Try[R any] interface {
 		Is[R]
 		To[R]
@@ -29,7 +31,9 @@ type (
 	Monadic[R any] interface {
 		// OrElse returns contained value if this is success; otherwise returns given `other` value.
 		OrElse(other R) R
-
+		LazySupport[R]
+	}
+	LazySupport[R any] interface {
 		// ForEach executes given procedure for success, skips for failure.
 		ForEach(procedure funcs.Procedure[R]) Try[R]
 
@@ -51,6 +55,9 @@ type (
 	success[R any] struct{ r R }
 	// failure represents failure value of Try.
 	failure[R any] struct{ err error }
+
+	// lazy represents lazy computation.
+	lazy[R any] struct{ delayed *goLazy.Of[Try[R]] }
 
 	FMapper[R, V any] funcs.Mapper[R, Try[V]]
 )
@@ -93,16 +100,56 @@ func (l failure[R]) FlatMap(fMap FMapper[R, R]) Try[R]               { return Fl
 func (l failure[R]) ForEach(_ funcs.Procedure[R]) Try[R]             { return l }
 func (l failure[R]) Get() (R, error)                                 { return deref.OrDefault[R](nil), l.err }
 
+// ----- lazy -----
+
+func (l lazy[R]) IsFailure() bool      { return l.delayed.Value().IsFailure() }
+func (l lazy[R]) IsSuccess() bool      { return l.delayed.Value().IsSuccess() }
+func (l lazy[R]) ToErr() error         { return l.delayed.Value().ToErr() }
+func (l lazy[R]) ToOpt() opt.Option[R] { return l.delayed.Value().ToOpt() }
+func (l lazy[R]) OrElse(other R) R     { return l.delayed.Value().OrElse(other) }
+func (l lazy[R]) ForEach(procedure funcs.Procedure[R]) Try[R] {
+	return Lazy(func() (R, error) {
+		return l.delayed.Value().ForEach(procedure).Get()
+	})
+}
+func (l lazy[R]) Proc(proc funcs.FallibleFunction[R]) Try[R] {
+	//return Lazy(func() (R, error) {
+	//
+	//})
+	return l.delayed.Value().Proc(proc)
+}
+func (l lazy[R]) ProcFailure(proc funcs.Procedure[error]) Try[R] {
+	return l.delayed.Value().ProcFailure(proc)
+}
+
+func (l lazy[R]) Map(mapper funcs.Mapper[R, R]) Try[R] {
+	return Lazy(func() (R, error) {
+		return l.delayed.Value().Map(mapper).Get()
+	})
+}
+
+func (l lazy[R]) MapFailure(lm funcs.Mapper[error, error]) Try[R] {
+	return l.delayed.Value().MapFailure(lm)
+}
+
+func (l lazy[R]) FlatMap(fMap FMapper[R, R]) Try[R] { return l.delayed.Value().FlatMap(fMap) }
+func (l lazy[R]) Get() (R, error)                   { return l.delayed.Value().Get() }
+
 // ----- General -----
 
 func Success[R any](r R) Try[R]       { return success[R]{r: r} }
 func Failure[R any](err error) Try[R] { return failure[R]{err: err} }
+func Of[R any](r R, err error) Try[R] { return Trie(r, err) } // Of is alias to Trie
 func Trie[R any](r R, err error) Try[R] {
 	if err != nil {
 		return Failure[R](err)
 	}
 
 	return Success(r)
+}
+
+func Lazy[R any](thunk funcs.FallibleFunction0[R]) Try[R] {
+	return lazy[R]{delayed: goLazy.New(func() Try[R] { return Of(thunk()) })}
 }
 
 func LiftOption[R any](o opt.Option[R], err error) Try[R] {
@@ -122,9 +169,11 @@ func Map[R, V any](e Try[R], f funcs.Mapper[R, V]) Try[V] {
 
 // FlatMap returns success with result of applying f to R, if this is success; otherwise it returns unchanged failure.
 func FlatMap[R, V any](e Try[R], f FMapper[R, V]) Try[V] {
-	if s, ok := e.(success[R]); ok {
-		return f(s.r)
-	}
-
-	return Failure[V](e.ToErr())
+	return Lazy[V](func() (V, error) {
+		if r, err := e.Get(); err != nil {
+			return deref.OrDefault[V](nil), err
+		} else {
+			return f(r).Get()
+		}
+	})
 }

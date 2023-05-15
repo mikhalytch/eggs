@@ -5,6 +5,8 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/fgrosse/zaptest v1.2.1 h1:QnbFHkIZcfICCzY1Grybxw9Em37RbGI6z5Lt6K/ROgw=
 github.com/fgrosse/zaptest v1.2.1/go.mod h1:qc5bd351XNR70Wy4GZU0LS+OEHzA/IrF7vi6zOfQlf4=
 github.com/hpcloud/tail v1.0.0 h1:nfCOvKYfkgYP8hkirhJocXT2+zOD8yUNjXaWfTlyFKI=
+github.com/hymkor/go-lazy v0.4.0 h1:KHZzn64U0UTwdj7rn6kp7RMgFQPQ7rp2ld5H3d2a+JI=
+github.com/hymkor/go-lazy v0.4.0/go.mod h1:7weoQ6ibzJeNdZ6sj50tjiCv0bJdQeXXXo2EMGm8tH4=
 github.com/onsi/ginkgo v1.7.0 h1:WSHQ+IS43OoUrWtD1/bbclrwK8TTH5hzp+umCiuxHgs=
 github.com/onsi/gomega v1.4.3 h1:RE1xgDvH7imwFD45h+u2SgIfERHlS2yNG4DObb5BSKU=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
