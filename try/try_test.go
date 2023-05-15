@@ -29,8 +29,20 @@ func TestFailure_OrElse(t *testing.T) {
 	require.Equal(t, "abc", try.Failure[string](io.EOF).OrElse("abc"))
 }
 
+func TestFailure_Get(t *testing.T) {
+	r, err := try.Failure[string](io.EOF).Get()
+	require.Equal(t, "", r)
+	require.ErrorIs(t, err, io.EOF)
+}
+
 func TestSuccess_OrElse(t *testing.T) {
 	require.Equal(t, 42, try.Success(42).OrElse(10))
+}
+
+func TestSuccess_Get(t *testing.T) {
+	r, err := try.Success("abc").Get()
+	require.NoError(t, err)
+	require.Equal(t, "abc", r)
 }
 
 func TestForEach(t *testing.T) {

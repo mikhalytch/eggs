@@ -1,6 +1,7 @@
 package try
 
 import (
+	"github.com/mikhalytch/eggs/deref"
 	"github.com/mikhalytch/eggs/funcs"
 	"github.com/mikhalytch/eggs/opt"
 )
@@ -12,6 +13,7 @@ type (
 		Is[R]
 		To[R]
 		Monadic[R]
+		GoIdiomatic[R]
 	}
 	Is[R any] interface {
 		IsFailure() bool
@@ -42,6 +44,9 @@ type (
 		// FlatMap is category unchanging method, variant of FlatMap function.
 		FlatMap(fMap FMapper[R, R]) Try[R]
 	}
+	GoIdiomatic[R any] interface {
+		Get() (R, error)
+	}
 	// success represents the success value of Try.
 	success[R any] struct{ r R }
 	// failure represents failure value of Try.
@@ -67,6 +72,7 @@ func (r success[R]) ForEach(p funcs.Procedure[R]) Try[R] {
 
 	return r
 }
+func (r success[R]) Get() (R, error) { return r.r, nil }
 
 // ----- failure -----
 
@@ -85,6 +91,7 @@ func (l failure[R]) Map(m funcs.Mapper[R, R]) Try[R]                 { return Ma
 func (l failure[R]) MapFailure(lm funcs.Mapper[error, error]) Try[R] { return Failure[R](lm(l.err)) }
 func (l failure[R]) FlatMap(fMap FMapper[R, R]) Try[R]               { return FlatMap[R](l, fMap) }
 func (l failure[R]) ForEach(_ funcs.Procedure[R]) Try[R]             { return l }
+func (l failure[R]) Get() (R, error)                                 { return deref.OrDefault[R](nil), l.err }
 
 // ----- General -----
 
