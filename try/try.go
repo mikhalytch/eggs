@@ -112,12 +112,14 @@ func (l lazy[R]) ForEach(procedure funcs.Procedure[R]) Try[R] {
 		return l.delayed.Value().ForEach(procedure).Get()
 	})
 }
+
 func (l lazy[R]) Proc(proc funcs.FallibleFunction[R]) Try[R] {
-	//return Lazy(func() (R, error) {
+	// return Lazy(func() (R, error) {
 	//
-	//})
+	// })
 	return l.delayed.Value().Proc(proc)
 }
+
 func (l lazy[R]) ProcFailure(proc funcs.Procedure[error]) Try[R] {
 	return l.delayed.Value().ProcFailure(proc)
 }
@@ -168,12 +170,13 @@ func Map[R, V any](e Try[R], f funcs.Mapper[R, V]) Try[V] {
 }
 
 // FlatMap returns success with result of applying f to R, if this is success; otherwise it returns unchanged failure.
-func FlatMap[R, V any](e Try[R], f FMapper[R, V]) Try[V] {
+func FlatMap[R, V any](e Try[R], fMapper FMapper[R, V]) Try[V] {
 	return Lazy[V](func() (V, error) {
-		if r, err := e.Get(); err != nil {
+		r, err := e.Get()
+		if err != nil {
 			return dflt.Of[V](), err
-		} else {
-			return f(r).Get()
 		}
+
+		return fMapper(r).Get()
 	})
 }

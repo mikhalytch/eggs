@@ -141,6 +141,7 @@ func TestFailure_FlatMap(t *testing.T) {
 		{func() try.Try[int] { return try.Failure[int](io.EOF) }},
 		{func() try.Try[int] { return try.Lazy(func() (int, error) { return 0, io.EOF }) }},
 	}
+
 	for i, test := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			_, err := test.newFailure().FlatMap(try.Success[int]).Get()
@@ -177,6 +178,7 @@ func TestFlatMap(t *testing.T) {
 	createSuccessInt := func(s string) try.Try[int] { return try.Trie(strconv.Atoi(s)) }
 
 	createFailureString := func(_ int) try.Try[string] { return try.Failure[string](http.ErrAbortHandler) }
+
 	t.Run("simple calc", func(t *testing.T) {
 		scss, err := try.FlatMap(try.Success("1"), createSuccessInt).Get()
 		require.NoError(t, err)
@@ -230,6 +232,7 @@ func TestLazy_StackDepth(t *testing.T) {
 
 		return lazy
 	}
+
 	t.Run("uncalled", func(t *testing.T) {
 		createLazy()
 	})
