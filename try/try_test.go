@@ -171,11 +171,11 @@ func TestSuccess_FlatMap(t *testing.T) {
 			require.ErrorIs(t, err, http.ErrAbortHandler)
 		})
 	}
-
 }
 
 func TestFlatMap(t *testing.T) {
 	createSuccessInt := func(s string) try.Try[int] { return try.Trie(strconv.Atoi(s)) }
+
 	createFailureString := func(_ int) try.Try[string] { return try.Failure[string](http.ErrAbortHandler) }
 	t.Run("simple calc", func(t *testing.T) {
 		scss, err := try.FlatMap(try.Success("1"), createSuccessInt).Get()

@@ -137,9 +137,9 @@ func (l lazy[R]) Get() (R, error)                   { return l.delayed.Value().G
 
 // ----- General -----
 
-func Success[R any](r R) Try[R]       { return success[R]{r: r} }
-func Failure[R any](err error) Try[R] { return failure[R]{err: err} }
-func Of[R any](r R, err error) Try[R] { return Trie(r, err) } // Of is alias to Trie
+func Success[R any](r R) Try[R]         { return success[R]{r: r} }
+func Failure[R any](err error) Try[R]   { return failure[R]{err: err} }
+func From[R any](r R, err error) Try[R] { return Trie(r, err) } // alias to Trie
 func Trie[R any](r R, err error) Try[R] {
 	if err != nil {
 		return Failure[R](err)
@@ -149,7 +149,7 @@ func Trie[R any](r R, err error) Try[R] {
 }
 
 func Lazy[R any](thunk funcs.FallibleFunction0[R]) Try[R] {
-	return lazy[R]{delayed: goLazy.New(func() Try[R] { return Of(thunk()) })}
+	return lazy[R]{delayed: goLazy.New(func() Try[R] { return From(thunk()) })}
 }
 
 func LiftOption[R any](o opt.Option[R], err error) Try[R] {
