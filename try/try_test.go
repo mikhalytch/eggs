@@ -145,13 +145,25 @@ func TestProc(t *testing.T) {
 }
 
 func TestProcFailure(t *testing.T) {
-	cnt := 0
-	f := func(e error) { cnt++ }
+	tests := []struct {
+		success, failure try.Try[int]
+	}{
+		{try.Success(1), try.Failure[int](io.EOF)},
+		{try.Lazy[int](func() (int, error) { return 1, nil }), try.Lazy[int](func() (int, error) { return 0, io.EOF })},
+	}
+	for i, test := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			cnt := 0
+			f := func(e error) { cnt++ }
 
-	try.Success(1).ProcFailure(f)
-	require.Equal(t, 0, cnt)
-	try.Failure[int](io.EOF).ProcFailure(f)
-	require.Equal(t, 1, cnt)
+			_, err := test.success.ProcFailure(f).Get()
+			require.NoError(t, err)
+			require.Equal(t, 0, cnt)
+			_, err = test.failure.ProcFailure(f).Get()
+			require.ErrorIs(t, err, io.EOF)
+			require.Equal(t, 1, cnt)
+		})
+	}
 }
 
 func TestFailure_Map(t *testing.T) {

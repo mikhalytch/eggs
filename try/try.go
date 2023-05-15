@@ -117,7 +117,9 @@ func (l lazy[R]) Proc(proc funcs.FallibleFunction[R]) Try[R] {
 }
 
 func (l lazy[R]) ProcFailure(proc funcs.Procedure[error]) Try[R] {
-	return l.delayed.Value().ProcFailure(proc)
+	return Lazy(func() (R, error) {
+		return l.delayed.Value().ProcFailure(proc).Get()
+	})
 }
 
 func (l lazy[R]) Map(mapper funcs.Mapper[R, R]) Try[R] {
