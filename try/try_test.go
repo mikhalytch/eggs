@@ -117,13 +117,23 @@ func TestToOpt(t *testing.T) {
 }
 
 func TestProc(t *testing.T) {
-	f := func(i int) error { return io.EOF }
-	s := func(i int) error { return nil }
+	tests := []struct {
+		success, failure try.Try[int]
+	}{
+		{try.Success(1), try.Failure[int](io.EOF)},
+		{try.Lazy[int](func() (int, error) { return 1, nil }), try.Lazy[int](func() (int, error) { return 0, io.EOF })},
+	}
+	for i, test := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			failF := func(i int) error { return http.ErrMissingFile }
+			scsF := func(i int) error { return nil }
 
-	require.Equal(t, try.Failure[int](http.ErrMissingFile), try.Failure[int](http.ErrMissingFile).Proc(f))
-	require.Equal(t, try.Failure[int](http.ErrMissingFile), try.Failure[int](http.ErrMissingFile).Proc(s))
-	require.Equal(t, try.Failure[int](io.EOF), try.Success(1).Proc(f))
-	require.Equal(t, try.Success(1), try.Success(1).Proc(s))
+			require.Equal(t, try.Failure[int](io.EOF), test.failure.Proc(failF))
+			require.Equal(t, try.Failure[int](io.EOF), test.failure.Proc(scsF))
+			require.Equal(t, try.Failure[int](http.ErrMissingFile), test.success.Proc(failF))
+			require.Equal(t, try.Success(1), test.success.Proc(scsF))
+		})
+	}
 }
 
 func TestProcFailure(t *testing.T) {
