@@ -84,8 +84,19 @@ func TestForEach(t *testing.T) {
 }
 
 func TestToErr(t *testing.T) {
-	require.NoError(t, try.Success(10).ToErr())
-	require.Equal(t, io.EOF, try.Failure[any](io.EOF).ToErr())
+	tests := []struct {
+		success try.Try[int]
+		failure try.Try[any]
+	}{
+		{try.Success(10), try.Failure[any](io.EOF)},
+		{try.Lazy[int](func() (int, error) { return 10, nil }), try.Lazy[any](func() (any, error) { return nil, io.EOF })},
+	}
+	for i, test := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			require.NoError(t, test.success.ToErr())
+			require.Equal(t, io.EOF, test.failure.ToErr())
+		})
+	}
 }
 
 func TestToOpt(t *testing.T) {
