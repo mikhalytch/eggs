@@ -111,10 +111,9 @@ func (l lazy[R]) ForEach(procedure funcs.Procedure[R]) Try[R] {
 }
 
 func (l lazy[R]) Proc(proc funcs.FallibleFunction[R]) Try[R] {
-	// return Lazy(func() (R, error) {
-	//
-	// })
-	return l.delayed.Value().Proc(proc)
+	return Lazy(func() (R, error) {
+		return l.delayed.Value().Proc(proc).Get()
+	})
 }
 
 func (l lazy[R]) ProcFailure(proc funcs.Procedure[error]) Try[R] {

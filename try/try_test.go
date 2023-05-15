@@ -128,10 +128,18 @@ func TestProc(t *testing.T) {
 			failF := func(i int) error { return http.ErrMissingFile }
 			scsF := func(i int) error { return nil }
 
-			require.Equal(t, try.Failure[int](io.EOF), test.failure.Proc(failF))
-			require.Equal(t, try.Failure[int](io.EOF), test.failure.Proc(scsF))
-			require.Equal(t, try.Failure[int](http.ErrMissingFile), test.success.Proc(failF))
-			require.Equal(t, try.Success(1), test.success.Proc(scsF))
+			_, err := test.failure.Proc(failF).Get()
+			require.ErrorIs(t, err, io.EOF)
+
+			_, err = test.failure.Proc(scsF).Get()
+			require.ErrorIs(t, err, io.EOF)
+
+			_, err = test.success.Proc(failF).Get()
+			require.ErrorIs(t, err, http.ErrMissingFile)
+
+			successSuccess, err := test.success.Proc(scsF).Get()
+			require.NoError(t, err)
+			require.Equal(t, 1, successSuccess)
 		})
 	}
 }
