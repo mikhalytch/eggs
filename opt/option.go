@@ -3,7 +3,7 @@ package opt
 import (
 	"errors"
 
-	"github.com/mikhalytch/eggs/deref"
+	"github.com/mikhalytch/eggs/dflt"
 	"github.com/mikhalytch/eggs/funcs"
 )
 
@@ -51,9 +51,9 @@ var ErrNoneGet = errors.New("none.Get")
 
 func (n none[T]) IsDefined() bool                        { return false }
 func (n none[T]) IsEmpty() bool                          { return !n.IsDefined() }
-func (n none[T]) Get() (T, error)                        { return deref.Of(new(T)), ErrNoneGet }
+func (n none[T]) Get() (T, error)                        { return dflt.Of[T](), ErrNoneGet }
 func (n none[T]) OrElse(other T) T                       { return other }
-func (n none[T]) OrDefault() T                           { return deref.OrDefault(new(T)) }
+func (n none[T]) OrDefault() T                           { return dflt.Of[T]() }
 func (n none[T]) ToSlice() []T                           { return []T{} }
 func (n none[T]) Filter(_ funcs.Predicate[T]) Option[T]  { return n }
 func (n none[T]) Map(m funcs.Mapper[T, T]) Option[T]     { return Map[T, T](n, m) }

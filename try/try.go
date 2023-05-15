@@ -3,7 +3,7 @@ package try
 import (
 	goLazy "github.com/hymkor/go-lazy"
 
-	"github.com/mikhalytch/eggs/deref"
+	"github.com/mikhalytch/eggs/dflt"
 	"github.com/mikhalytch/eggs/funcs"
 	"github.com/mikhalytch/eggs/opt"
 )
@@ -98,7 +98,7 @@ func (l failure[R]) Map(m funcs.Mapper[R, R]) Try[R]                 { return Ma
 func (l failure[R]) MapFailure(lm funcs.Mapper[error, error]) Try[R] { return Failure[R](lm(l.err)) }
 func (l failure[R]) FlatMap(fMap FMapper[R, R]) Try[R]               { return FlatMap[R](l, fMap) }
 func (l failure[R]) ForEach(_ funcs.Procedure[R]) Try[R]             { return l }
-func (l failure[R]) Get() (R, error)                                 { return deref.OrDefault[R](nil), l.err }
+func (l failure[R]) Get() (R, error)                                 { return dflt.Of[R](), l.err }
 
 // ----- lazy -----
 
@@ -171,7 +171,7 @@ func Map[R, V any](e Try[R], f funcs.Mapper[R, V]) Try[V] {
 func FlatMap[R, V any](e Try[R], f FMapper[R, V]) Try[V] {
 	return Lazy[V](func() (V, error) {
 		if r, err := e.Get(); err != nil {
-			return deref.OrDefault[V](nil), err
+			return dflt.Of[V](), err
 		} else {
 			return f(r).Get()
 		}
