@@ -100,10 +100,20 @@ func TestToErr(t *testing.T) {
 }
 
 func TestToOpt(t *testing.T) {
-	require.NotEqual(t, opt.None[int](), try.Failure[any](io.EOF).ToOpt())
-	require.EqualValues(t, opt.None[int](), try.Failure[any](io.EOF).ToOpt())
-	require.Equal(t, opt.None[int](), try.Failure[int](io.EOF).ToOpt())
-	require.Equal(t, opt.Some(10), try.Success(10).ToOpt())
+	tests := []struct {
+		success, failure try.Try[int]
+	}{
+		{try.Success(10), try.Failure[int](io.EOF)},
+		{try.Lazy[int](func() (int, error) { return 10, nil }), try.Lazy[int](func() (int, error) { return 0, io.EOF })},
+	}
+	for i, test := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			require.NotEqual(t, opt.None[any](), test.failure.ToOpt())
+			require.EqualValues(t, opt.None[any](), test.failure.ToOpt())
+			require.Equal(t, opt.None[int](), test.failure.ToOpt())
+			require.Equal(t, opt.Some(10), test.success.ToOpt())
+		})
+	}
 }
 
 func TestProc(t *testing.T) {
