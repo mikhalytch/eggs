@@ -17,16 +17,27 @@ import (
 func TestIsFailure(t *testing.T) {
 	require.True(t, try.Failure[int](io.EOF).IsFailure())
 	require.False(t, try.Success(1).IsFailure())
+
+	require.True(t, try.Lazy[int](func() (int, error) { return 0, io.EOF }).IsFailure())
+	require.False(t, try.Lazy[int](func() (int, error) { return 0, nil }).IsFailure())
 }
 
 func TestIsSuccess(t *testing.T) {
 	require.False(t, try.Failure[string](io.EOF).IsSuccess())
 	require.True(t, try.Success("abc").IsSuccess())
+
+	require.False(t, try.Lazy[string](func() (string, error) { return "", io.EOF }).IsSuccess())
+	require.True(t, try.Lazy[string](func() (string, error) { return "", nil }).IsSuccess())
 }
 
 func TestFailure_OrElse(t *testing.T) {
 	require.Equal(t, 2, try.LiftOption(opt.None[int](), io.EOF).OrElse(2))
 	require.Equal(t, "abc", try.Failure[string](io.EOF).OrElse("abc"))
+}
+
+func TestLazy_OrElse(t *testing.T) {
+	require.Equal(t, 1, try.Lazy[int](func() (int, error) { return 1, nil }).OrElse(2))
+	require.Equal(t, "abc", try.Lazy[string](func() (string, error) { return "", io.EOF }).OrElse("abc"))
 }
 
 func TestFailure_Get(t *testing.T) {
