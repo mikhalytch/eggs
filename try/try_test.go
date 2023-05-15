@@ -30,14 +30,14 @@ func TestIsSuccess(t *testing.T) {
 	require.True(t, try.Lazy[string](func() (string, error) { return "", nil }).IsSuccess())
 }
 
-func TestFailure_OrElse(t *testing.T) {
-	require.Equal(t, 2, try.LiftOption(opt.None[int](), io.EOF).OrElse(2))
-	require.Equal(t, "abc", try.Failure[string](io.EOF).OrElse("abc"))
+func TestFailure_GetOrElse(t *testing.T) {
+	require.Equal(t, 2, try.LiftOption(opt.None[int](), io.EOF).GetOrElse(2))
+	require.Equal(t, "abc", try.Failure[string](io.EOF).GetOrElse("abc"))
 }
 
-func TestLazy_OrElse(t *testing.T) {
-	require.Equal(t, 1, try.Lazy[int](func() (int, error) { return 1, nil }).OrElse(2))
-	require.Equal(t, "abc", try.Lazy[string](func() (string, error) { return "", io.EOF }).OrElse("abc"))
+func TestLazy_GetOrElse(t *testing.T) {
+	require.Equal(t, 1, try.Lazy[int](func() (int, error) { return 1, nil }).GetOrElse(2))
+	require.Equal(t, "abc", try.Lazy[string](func() (string, error) { return "", io.EOF }).GetOrElse("abc"))
 }
 
 func TestFailure_Get(t *testing.T) {
@@ -46,8 +46,8 @@ func TestFailure_Get(t *testing.T) {
 	require.ErrorIs(t, err, io.EOF)
 }
 
-func TestSuccess_OrElse(t *testing.T) {
-	require.Equal(t, 42, try.Success(42).OrElse(10))
+func TestSuccess_GetOrElse(t *testing.T) {
+	require.Equal(t, 42, try.Success(42).GetOrElse(10))
 }
 
 func TestSuccess_Get(t *testing.T) {

@@ -17,7 +17,7 @@ type (
 		IsDefined() bool
 		IsEmpty() bool
 		Get() (T, error)
-		OrElse(other T) T
+		GetOrElse(other T) T
 		OrDefault() T
 		ToSlice() []T
 		Filter(p funcs.Predicate[T]) Option[T]
@@ -52,7 +52,7 @@ var ErrNoneGet = errors.New("none.Get")
 func (n none[T]) IsDefined() bool                        { return false }
 func (n none[T]) IsEmpty() bool                          { return !n.IsDefined() }
 func (n none[T]) Get() (T, error)                        { return dflt.Of[T](), ErrNoneGet }
-func (n none[T]) OrElse(other T) T                       { return other }
+func (n none[T]) GetOrElse(other T) T                    { return other }
 func (n none[T]) OrDefault() T                           { return dflt.Of[T]() }
 func (n none[T]) ToSlice() []T                           { return []T{} }
 func (n none[T]) Filter(_ funcs.Predicate[T]) Option[T]  { return n }
@@ -65,7 +65,7 @@ func (n none[T]) Foreach(_ funcs.Procedure[T]) Option[T] { return n }
 func (s some[T]) IsDefined() bool { return true }
 func (s some[T]) IsEmpty() bool   { return !s.IsDefined() }
 func (s some[T]) Get() (T, error) { return s.t, nil }
-func (s some[T]) OrElse(_ T) T    { return s.t }
+func (s some[T]) GetOrElse(_ T) T { return s.t }
 func (s some[T]) OrDefault() T    { return s.t }
 func (s some[T]) ToSlice() []T    { return []T{s.t} }
 func (s some[T]) Filter(p funcs.Predicate[T]) Option[T] {

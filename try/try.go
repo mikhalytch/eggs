@@ -29,8 +29,8 @@ type (
 		ToOpt() opt.Option[R]
 	}
 	Monadic[R any] interface {
-		// OrElse returns contained value if this is success; otherwise returns given `other` value.
-		OrElse(other R) R
+		// GetOrElse returns contained value if this is success; otherwise returns given `other` value.
+		GetOrElse(other R) R
 		LazySupport[R]
 	}
 	LazySupport[R any] interface {
@@ -66,7 +66,7 @@ type (
 
 func (r success[R]) IsFailure() bool                                { return !r.IsSuccess() }
 func (r success[R]) IsSuccess() bool                                { return true }
-func (r success[R]) OrElse(_ R) R                                   { return r.r }
+func (r success[R]) GetOrElse(_ R) R                                { return r.r }
 func (r success[R]) ToErr() error                                   { return nil }
 func (r success[R]) ToOpt() opt.Option[R]                           { return opt.Some(r.r) }
 func (r success[R]) Proc(proc funcs.FallibleFunction[R]) Try[R]     { return Trie(r.r, proc(r.r)) }
@@ -85,7 +85,7 @@ func (r success[R]) Get() (R, error) { return r.r, nil }
 
 func (l failure[R]) IsFailure() bool                         { return true }
 func (l failure[R]) IsSuccess() bool                         { return !l.IsFailure() }
-func (l failure[R]) OrElse(other R) R                        { return other }
+func (l failure[R]) GetOrElse(other R) R                     { return other }
 func (l failure[R]) ToErr() error                            { return l.err }
 func (l failure[R]) ToOpt() opt.Option[R]                    { return opt.None[R]() }
 func (l failure[R]) Proc(_ funcs.FallibleFunction[R]) Try[R] { return l }
@@ -106,7 +106,7 @@ func (l lazy[R]) IsFailure() bool      { return l.delayed.Value().IsFailure() }
 func (l lazy[R]) IsSuccess() bool      { return l.delayed.Value().IsSuccess() }
 func (l lazy[R]) ToErr() error         { return l.delayed.Value().ToErr() }
 func (l lazy[R]) ToOpt() opt.Option[R] { return l.delayed.Value().ToOpt() }
-func (l lazy[R]) OrElse(other R) R     { return l.delayed.Value().OrElse(other) }
+func (l lazy[R]) GetOrElse(other R) R  { return l.delayed.Value().GetOrElse(other) }
 func (l lazy[R]) ForEach(procedure funcs.Procedure[R]) Try[R] {
 	return Lazy(func() (R, error) {
 		return l.delayed.Value().ForEach(procedure).Get()

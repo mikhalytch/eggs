@@ -44,9 +44,9 @@ func TestGet(t *testing.T) {
 	require.Error(t, tuple.Err(opt.None[int]().Get()).T2())
 }
 
-func TestOrElse(t *testing.T) {
-	require.Equal(t, 1, opt.Some(1).OrElse(2))
-	require.Equal(t, 1, opt.None[int]().OrElse(1))
+func TestGetOrElse(t *testing.T) {
+	require.Equal(t, 1, opt.Some(1).GetOrElse(2))
+	require.Equal(t, 1, opt.None[int]().GetOrElse(1))
 }
 
 func TestNone_OrDefault(t *testing.T) {
