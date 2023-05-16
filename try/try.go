@@ -9,47 +9,39 @@ import (
 )
 
 type (
-	// Try is like Either, with left type simplified to error
-	// (i.e. Try[T].ToEither() === Either[error, T]).
+	// Try is like Either[L,R], with L-eft type simplified to error (i.e. Try[R] === Either[error, R]).
 	Try[R any] interface {
 		Is[R]
 		To[R]
+		SideEffects[R]
 		Monadic[R]
-		GoIdiomatic[R]
+		Getters[R]
 	}
 	Is[R any] interface {
 		IsFailure() bool
 		IsSuccess() bool
 	}
 	To[R any] interface {
-		// ToErr is nil for success, and error for failure
-		ToErr() error
-
-		// ToOpt converts success to opt.Some, failure to opt.None.
-		ToOpt() opt.Option[R]
+		ToErr() error         // ToErr is nil for success, and error for failure
+		ToOpt() opt.Option[R] // ToOpt converts success to opt.Some, failure to opt.None.
+	}
+	SideEffects[R any] interface {
+		ForEach(procedure funcs.Procedure[R]) Try[R]    // ForEach executes given procedure for success, skips for failure.
+		ProcFailure(proc funcs.Procedure[error]) Try[R] // ProcFailure is failure ForEach counterpart
 	}
 	Monadic[R any] interface {
-		// GetOrElse returns contained value if this is success; otherwise returns given `other` value.
-		GetOrElse(other R) R
-		// ForEach executes given procedure for success, skips for failure.
-		ForEach(procedure funcs.Procedure[R]) Try[R]
-		Functional[R]
-	}
-	Functional[R any] interface {
-		// Proc does nothing for left; it turns success to failure on proc error
-		Proc(proc funcs.FallibleFunction[R]) Try[R]
-		ProcFailure(proc funcs.Procedure[error]) Try[R]
+		OrElse(els Try[R]) Try[R]
 
-		// Map is category unchanging method, variant of Map function.
-		Map(mapper funcs.Mapper[R, R]) Try[R]
+		Map(mapper funcs.Mapper[R, R]) Try[R] // Map is category unchanging method; @see Map function.
 		MapFailure(lm funcs.Mapper[error, error]) Try[R]
 
-		// FlatMap is category unchanging method, variant of FlatMap function.
-		FlatMap(fMap FMapper[R, R]) Try[R]
+		FlatMap(fMap FMapper[R, R]) Try[R] // FlatMap is category unchanging method; @see FlatMap function.
 	}
-	GoIdiomatic[R any] interface {
+	Getters[R any] interface {
+		GetOrElse(other R) R // GetOrElse returns result on success, `other` on failure.
 		Get() (R, error)
 	}
+
 	// success represents the success value of Try.
 	success[R any] struct{ r R }
 	// failure represents failure value of Try.
@@ -59,6 +51,12 @@ type (
 	lazy[R any] struct{ delayed *goLazy.Of[Try[R]] }
 
 	FMapper[R, V any] funcs.Mapper[R, Try[V]]
+)
+
+var (
+	_ Try[any] = (success[any])(nil)
+	_ Try[any] = (failure[any])(nil)
+	_ Try[any] = (lazy[any])(nil)
 )
 
 // ----- success -----
