@@ -42,13 +42,9 @@ type (
 		Get() (R, error)
 	}
 
-	// success represents the success value of Try.
-	success[R any] struct{ r R }
-	// failure represents failure value of Try.
-	failure[R any] struct{ err error }
-
-	// lazy represents lazy computation.
-	lazy[R any] struct{ delayed *goLazy.Of[Try[R]] }
+	success[R any] struct{ r R }                        // success represents the success value of Try.
+	failure[R any] struct{ err error }                  // failure represents failure value of Try.
+	lazy[R any]    struct{ delayed *goLazy.Of[Try[R]] } // lazy postpones Try.
 
 	FMapper[R, V any] funcs.Mapper[R, Try[V]]
 )
