@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/fgrosse/zaptest v1.2.1
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.3
 	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20230213192124-5e25df0256eb
 )
