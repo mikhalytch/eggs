@@ -31,6 +31,23 @@ func Filter[T any](predicate funcs.Predicate[T]) funcs.Applier[[]T, []T] {
 	}
 }
 
+// Split returns funcs.Applier producing suitable for predicate values on the left, and non-suitable on the right.
+func Split[T any](predicate funcs.Predicate[T]) func([]T) ([]T, []T) {
+	return func(ts []T) ([]T, []T) {
+		suitable, nonSuitable := make([]T, 0), make([]T, 0)
+
+		for _, t := range ts {
+			if predicate(t) {
+				suitable = append(suitable, t)
+			} else {
+				nonSuitable = append(nonSuitable, t)
+			}
+		}
+
+		return suitable, nonSuitable
+	}
+}
+
 func Head[T any](ts []T) T   { return ts[0] }
 func Tail[T any](ts []T) []T { return ts[1:] }
 func HeadOpt[T any](ts []T) opt.Option[T] {

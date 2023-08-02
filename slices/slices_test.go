@@ -30,6 +30,24 @@ func TestFilter(t *testing.T) {
 		slices.Filter(func(i string) bool { return i < "efg" })([]string{"abc", "cde", "efg"}))
 }
 
+func TestSplit(t *testing.T) {
+	even, odd := slices.Split(func(i int) bool { return i%2 == 0 })(nil)
+	require.Equal(t, []int{}, even)
+	require.Equal(t, []int{}, odd)
+
+	even, odd = slices.Split(func(i int) bool { return i%2 == 0 })([]int{})
+	require.Equal(t, []int{}, even)
+	require.Equal(t, []int{}, odd)
+
+	even, odd = slices.Split(func(i int) bool { return i%2 == 0 })([]int{0, 1, 2})
+	require.Equal(t, []int{0, 2}, even)
+	require.Equal(t, []int{1}, odd)
+
+	as, bs := slices.Split(func(i rune) bool { return i == 'a' })([]rune{'a', 'b'})
+	require.Equal(t, []rune{'a'}, as)
+	require.Equal(t, []rune{'b'}, bs)
+}
+
 func TestHead(t *testing.T) {
 	t.Run("existing elements", func(t *testing.T) {
 		require.Equal(t, 1, slices.Head([]int{1, 2, 3}))
