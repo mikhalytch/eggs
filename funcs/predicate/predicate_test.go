@@ -22,6 +22,12 @@ func TestAlways(t *testing.T) {
 	require.True(t, predicate.Always[any](nil))
 }
 
+func TestNot(t *testing.T) {
+	require.False(t, predicate.Not(predicate.Always[int])(1))
+	require.False(t, predicate.Not(predicate.Always[string])("abc"))
+	require.False(t, predicate.Not(predicate.Always[any])(nil))
+}
+
 func TestNever(t *testing.T) {
 	require.False(t, predicate.Never(1))
 	require.False(t, predicate.Never("abc"))
