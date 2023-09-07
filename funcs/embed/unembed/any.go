@@ -4,6 +4,8 @@ import "github.com/mikhalytch/eggs/constraints"
 
 func String[T constraints.String](t T) string { return string(t) }
 
+func Bool[T constraints.Bool](t T) bool { return bool(t) }
+
 func Complex64[T constraints.Complex64](t T) complex64    { return complex64(t) }
 func Complex128[T constraints.Complex128](t T) complex128 { return complex128(t) }
 

@@ -20,6 +20,18 @@ func TestUnEmbedString(t *testing.T) {
 	})
 }
 
+func TestUnEmbedBool(t *testing.T) {
+	t.Run("bool", func(t *testing.T) {
+		type testType bool
+		testVal := false
+
+		emb := testType(testVal)
+		require.NotEqual(t, testVal, emb)
+
+		require.Equal(t, testVal, unembed.Bool[testType](emb))
+	})
+}
+
 func TestUnEmbedInt(t *testing.T) {
 	t.Run("int", func(t *testing.T) {
 		type testType int

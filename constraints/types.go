@@ -3,6 +3,8 @@ package constraints
 type (
 	String interface{ ~string }
 
+	Bool interface{ ~bool }
+
 	Complex64  interface{ ~complex64 }
 	Complex128 interface{ ~complex128 }
 
