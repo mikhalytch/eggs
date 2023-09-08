@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/mikhalytch/eggs/funcs/mapper"
+	"github.com/mikhalytch/eggs/slices"
 )
 
 func TestIdentity(t *testing.T) {
@@ -24,4 +25,18 @@ func TestAlways(t *testing.T) {
 	require.Equal(t, 5, alw(-100))
 	require.Equal(t, 5, alw(0))
 	require.Equal(t, 5, alw(1))
+}
+
+func TestStruct(t *testing.T) {
+	l := []string{"a", "b"}
+
+	index := slices.ToMapWithValues(mapper.Struct[string])(l)
+
+	_, aOk := index["a"]
+	_, bOk := index["b"]
+	_, cOk := index["c"]
+
+	require.True(t, aOk)
+	require.True(t, bOk)
+	require.False(t, cOk)
 }
