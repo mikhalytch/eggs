@@ -1,6 +1,7 @@
 package embed_test
 
 import (
+	strconv2 "strconv"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -23,12 +24,22 @@ func TestEmbedString(t *testing.T) {
 func TestEmbedBool(t *testing.T) {
 	t.Run("bool", func(t *testing.T) {
 		type testType bool
-		testVal := true
+		tests := []struct {
+			v bool
+		}{
+			{true},
+			{false},
+		}
+		for i, test := range tests {
+			t.Run(strconv2.Itoa(i), func(t *testing.T) {
+				testVal := test.v
 
-		emb := testType(testVal)
-		require.NotEqual(t, testVal, emb)
+				emb := testType(testVal)
+				require.NotEqual(t, testVal, emb)
 
-		require.Equal(t, emb, embed.Bool[testType](testVal))
+				require.Equal(t, emb, embed.Bool[testType](testVal))
+			})
+		}
 	})
 }
 
