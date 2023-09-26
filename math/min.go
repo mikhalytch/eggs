@@ -1,11 +1,11 @@
 package math
 
 import (
-	"golang.org/x/exp/constraints"
+	"github.com/mikhalytch/eggs/constraints"
 )
 
 func Min[T constraints.Ordered](first T, other ...T) T {
-	min := func(a, b T) T {
+	minF := func(a, b T) T {
 		if a < b {
 			return a
 		}
@@ -15,7 +15,7 @@ func Min[T constraints.Ordered](first T, other ...T) T {
 
 	res := first
 	for _, _b := range other {
-		res = min(res, _b)
+		res = minF(res, _b)
 	}
 
 	return res

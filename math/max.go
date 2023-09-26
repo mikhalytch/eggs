@@ -1,11 +1,11 @@
 package math
 
 import (
-	"golang.org/x/exp/constraints"
+	"github.com/mikhalytch/eggs/constraints"
 )
 
 func Max[T constraints.Ordered](first T, other ...T) T {
-	max := func(a, b T) T {
+	maxF := func(a, b T) T {
 		if a > b {
 			return a
 		}
@@ -15,7 +15,7 @@ func Max[T constraints.Ordered](first T, other ...T) T {
 
 	res := first
 	for _, _b := range other {
-		res = max(res, _b)
+		res = maxF(res, _b)
 	}
 
 	return res
