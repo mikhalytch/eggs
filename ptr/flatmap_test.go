@@ -11,8 +11,8 @@ import (
 )
 
 func TestFlatMap(t *testing.T) {
-	fmSS := func(t string) *string { return ptr.Of(unembed.String[string](t)) }
-	fmIS := func(t int) *string { return ptr.Of(strconv.Itoa(t)) }
+	fmSS := func(t *string) *string { return ptr.Of(unembed.String[string](*t)) }
+	fmIS := func(t *int) *string { return ptr.Of(strconv.Itoa(*t)) }
 
 	require.Nil(t, ptr.FlatMap(ptr.None[string](), fmSS))
 	require.Nil(t, ptr.FlatMap(ptr.None[int](), fmIS))
