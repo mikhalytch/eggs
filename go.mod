@@ -1,6 +1,6 @@
 module github.com/mikhalytch/eggs
 
-go 1.18
+go 1.20
 
 require (
 	github.com/fgrosse/zaptest v1.2.1
