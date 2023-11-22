@@ -3,7 +3,7 @@ package strconv
 import (
 	"strconv"
 
-	"github.com/mikhalytch/eggs/constraints"
+	baseConstraints "github.com/mikhalytch/eggs/constraints/base"
 )
 
-func StoA[T constraints.Signed](t T) string { return strconv.FormatInt(int64(t), 10) }
+func StoA[T baseConstraints.Signed](t T) string { return strconv.FormatInt(int64(t), 10) }

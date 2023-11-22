@@ -1,7 +1,7 @@
 package predicate
 
 import (
-	"github.com/mikhalytch/eggs/constraints"
+	baseConstraints "github.com/mikhalytch/eggs/constraints/base"
 )
 
-func NonZero[A constraints.Integer](a A) bool { return a != 0 }
+func NonZero[A baseConstraints.Integer](a A) bool { return a != 0 }

@@ -1,10 +1,10 @@
 package math
 
 import (
-	"github.com/mikhalytch/eggs/constraints"
+	baseConstraints "github.com/mikhalytch/eggs/constraints/base"
 )
 
-func Max[T constraints.Ordered](first T, other ...T) T {
+func Max[T baseConstraints.Ordered](first T, other ...T) T {
 	maxF := func(a, b T) T {
 		if a > b {
 			return a

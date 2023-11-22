@@ -3,7 +3,7 @@ package strconv
 import (
 	"strconv"
 
-	"github.com/mikhalytch/eggs/constraints"
+	baseConstraints "github.com/mikhalytch/eggs/constraints/base"
 )
 
-func UtoA[T constraints.Unsigned](t T) string { return strconv.FormatUint(uint64(t), 10) }
+func UtoA[T baseConstraints.Unsigned](t T) string { return strconv.FormatUint(uint64(t), 10) }
