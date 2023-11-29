@@ -48,8 +48,16 @@ func Split[T any](predicate funcs.Predicate[T]) func([]T) ([]T, []T) {
 	}
 }
 
-func Head[T any](ts []T) T   { return ts[0] }
-func Tail[T any](ts []T) []T { return ts[1:] }
+func Head[T any](ts []T) T { return ts[0] }
+
+func Tail[T any](ts []T) []T {
+	if len(ts) < 1 {
+		return nil
+	}
+
+	return ts[1:]
+}
+
 func HeadOption[T any](ts []T) opt.Option[T] {
 	if len(ts) < 1 {
 		return opt.None[T]()
