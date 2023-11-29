@@ -58,6 +58,14 @@ func HeadOption[T any](ts []T) opt.Option[T] {
 	return opt.Some(Head(ts))
 }
 
+func HeadOpt[T any](ts []T) *T {
+	if len(ts) < 1 {
+		return nil
+	}
+
+	return &ts[0]
+}
+
 func Flatten[T any](tss [][]T) []T { return Join(tss...) }
 func Join[T any](tss ...[]T) []T {
 	if len(tss) == 0 {

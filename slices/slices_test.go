@@ -7,6 +7,7 @@ import (
 
 	"github.com/mikhalytch/eggs/funcs/predicate"
 	"github.com/mikhalytch/eggs/opt"
+	"github.com/mikhalytch/eggs/ptr"
 	"github.com/mikhalytch/eggs/slices"
 )
 
@@ -76,6 +77,12 @@ func TestHeadOption(t *testing.T) {
 	require.Equal(t, opt.Some(1), slices.HeadOption([]int{1, 2}))
 	require.Equal(t, opt.Some("a"), slices.HeadOption([]string{"a"}))
 	require.Equal(t, opt.None[int](), slices.HeadOption([]int{}))
+}
+
+func TestHeadOpt(t *testing.T) {
+	require.Equal(t, ptr.Of(1), slices.HeadOpt([]int{1, 2}))
+	require.Equal(t, ptr.Of("a"), slices.HeadOpt([]string{"a"}))
+	require.Nil(t, slices.HeadOpt([]int{}))
 }
 
 func TestFlatten(t *testing.T) {
