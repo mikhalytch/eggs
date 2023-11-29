@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/mikhalytch/eggs/math"
+	"github.com/mikhalytch/eggs/ptr"
 	"github.com/mikhalytch/eggs/slices"
 )
 
@@ -56,4 +57,12 @@ func TestMax(t *testing.T) {
 			})
 		}
 	})
+}
+
+func TestMaxOpt(t *testing.T) {
+	require.Nil(t, math.MaxOpt[int]())
+	require.Nil(t, math.MaxOpt[int](nil...))
+	require.Nil(t, math.MaxOpt[int](nil, nil, nil))
+
+	require.Equal(t, ptr.Of("z"), math.MaxOpt(nil, ptr.Of("a"), nil, ptr.Of("z"), ptr.Of("b"), nil))
 }
