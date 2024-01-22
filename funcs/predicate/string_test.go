@@ -24,3 +24,8 @@ func TestIsBlank(t *testing.T) {
 	require.False(t, predicate.IsBlank(testVal+"sdf"))
 	require.False(t, predicate.IsBlank(" sdf"))
 }
+
+func TestContainsString(t *testing.T) {
+	require.True(t, predicate.ContainsString("aa")(`aabbcc`))
+	require.False(t, predicate.ContainsString("aa")(`ababcc`))
+}
