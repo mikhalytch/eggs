@@ -12,6 +12,7 @@ import (
 func TestEmbedString(t *testing.T) {
 	t.Run("string", func(t *testing.T) {
 		type testType string
+
 		testVal := "abc"
 
 		emb := testType(testVal)
@@ -24,12 +25,14 @@ func TestEmbedString(t *testing.T) {
 func TestEmbedBool(t *testing.T) {
 	t.Run("bool", func(t *testing.T) {
 		type testType bool
+
 		tests := []struct {
 			v bool
 		}{
 			{true},
 			{false},
 		}
+
 		for i, test := range tests {
 			t.Run(strconv2.Itoa(i), func(t *testing.T) {
 				testVal := test.v
@@ -46,6 +49,7 @@ func TestEmbedBool(t *testing.T) {
 func TestEmbedInt(t *testing.T) {
 	t.Run("int", func(t *testing.T) {
 		type testType int
+
 		testVal := 123
 
 		emb := testType(testVal)
@@ -55,6 +59,7 @@ func TestEmbedInt(t *testing.T) {
 	})
 	t.Run("int64", func(t *testing.T) {
 		type testType int64
+
 		testVal := int64(123)
 
 		emb := testType(testVal)
@@ -64,6 +69,7 @@ func TestEmbedInt(t *testing.T) {
 	})
 	t.Run("int32", func(t *testing.T) {
 		type testType int32
+
 		testVal := int32(123)
 
 		emb := testType(testVal)
@@ -73,6 +79,7 @@ func TestEmbedInt(t *testing.T) {
 	})
 	t.Run("int16", func(t *testing.T) {
 		type testType int16
+
 		testVal := int16(123)
 
 		emb := testType(testVal)
@@ -82,6 +89,7 @@ func TestEmbedInt(t *testing.T) {
 	})
 	t.Run("int8", func(t *testing.T) {
 		type testType int8
+
 		testVal := int8(123)
 
 		emb := testType(testVal)
@@ -94,6 +102,7 @@ func TestEmbedInt(t *testing.T) {
 func TestEmbedUint(t *testing.T) {
 	t.Run("Uint8", func(t *testing.T) {
 		type testType uint8
+
 		testVal := uint8(123)
 
 		emb := testType(testVal)
@@ -103,6 +112,7 @@ func TestEmbedUint(t *testing.T) {
 	})
 	t.Run("Uint16", func(t *testing.T) {
 		type testType uint16
+
 		testVal := uint16(123)
 
 		emb := testType(testVal)
@@ -112,6 +122,7 @@ func TestEmbedUint(t *testing.T) {
 	})
 	t.Run("Uint32", func(t *testing.T) {
 		type testType uint32
+
 		testVal := uint32(123)
 
 		emb := testType(testVal)
@@ -121,6 +132,7 @@ func TestEmbedUint(t *testing.T) {
 	})
 	t.Run("Uint64", func(t *testing.T) {
 		type testType uint64
+
 		testVal := uint64(123)
 
 		emb := testType(testVal)
@@ -130,6 +142,7 @@ func TestEmbedUint(t *testing.T) {
 	})
 	t.Run("Uintptr", func(t *testing.T) {
 		type testType uintptr
+
 		testVal := uintptr(123)
 
 		emb := testType(testVal)
@@ -139,6 +152,7 @@ func TestEmbedUint(t *testing.T) {
 	})
 	t.Run("Uint", func(t *testing.T) {
 		type testType uint
+
 		testVal := uint(123)
 
 		emb := testType(testVal)
@@ -151,6 +165,7 @@ func TestEmbedUint(t *testing.T) {
 func TestEmbedFloat(t *testing.T) {
 	t.Run("Float32", func(t *testing.T) {
 		type testType float32
+
 		testVal := float32(123)
 
 		emb := testType(testVal)
@@ -160,6 +175,7 @@ func TestEmbedFloat(t *testing.T) {
 	})
 	t.Run("Float64", func(t *testing.T) {
 		type testType float64
+
 		testVal := float64(123)
 
 		emb := testType(testVal)
@@ -172,6 +188,7 @@ func TestEmbedFloat(t *testing.T) {
 func TestEmbedComplex(t *testing.T) {
 	t.Run("Complex64", func(t *testing.T) {
 		type testType complex64
+
 		testVal := complex(float32(123), 345)
 
 		emb := testType(testVal)
@@ -181,6 +198,7 @@ func TestEmbedComplex(t *testing.T) {
 	})
 	t.Run("Complex128", func(t *testing.T) {
 		type testType complex128
+
 		testVal := complex(123, 456)
 
 		emb := testType(testVal)

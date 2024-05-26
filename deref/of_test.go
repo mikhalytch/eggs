@@ -25,6 +25,7 @@ func TestOf(t *testing.T) {
 			v  int
 			v1 string
 		}
+
 		a := A{1, "a"}
 		require.Equal(t, a, deref.Of(&a))
 		require.Equal(t, A{1, "a"}, deref.Of(&a))
@@ -32,10 +33,12 @@ func TestOf(t *testing.T) {
 	})
 	t.Run("pointer", func(t *testing.T) {
 		var unassigned *string
+
 		require.Nil(t, deref.Of(&unassigned))
 		require.Panics(t, func() {
 			_ = *deref.Of(&unassigned)
 		})
+
 		assigned := ptr.Of("bad")
 		require.Equal(t, "bad", *deref.OrDefault(&assigned))
 	})

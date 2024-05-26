@@ -10,8 +10,11 @@ import (
 
 func TestReembedInt(t *testing.T) {
 	t.Run("int32", func(t *testing.T) {
-		type iTestType uint16
-		type oTestType int32
+		type (
+			iTestType uint16
+			oTestType int32
+		)
+
 		testVal := iTestType(123)
 
 		emb := oTestType(testVal)

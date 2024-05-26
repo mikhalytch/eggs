@@ -14,6 +14,7 @@ import (
 func TestMap(t *testing.T) {
 	t.Run("String mapper", func(t *testing.T) {
 		type Name string
+
 		require.ElementsMatch(t, []string{"k1", "k2"}, mapkeys.Map(map[Name]int{"k1": 1, "k2": 2}, unembed.String[Name]))
 		require.ElementsMatch(t, []string{}, mapkeys.Map(map[Name]int{}, unembed.String[Name]))
 	})

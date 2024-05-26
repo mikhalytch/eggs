@@ -70,6 +70,7 @@ func TestTail(t *testing.T) {
 		require.Empty(t, slices.Tail([]int{}))
 
 		type Name string
+
 		require.Empty(t, slices.Tail[Name](nil))
 	})
 }

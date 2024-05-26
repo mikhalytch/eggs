@@ -47,7 +47,7 @@ func TestSuccess_Get(t *testing.T) {
 
 func TestForEach(t *testing.T) {
 	cnt := 0
-	inc := func(i any) { cnt++ }
+	inc := func(_ any) { cnt++ }
 
 	try.Failure[any](io.EOF).ForEach(inc)
 	require.Equal(t, 0, cnt)
@@ -69,8 +69,8 @@ func TestToOpt(t *testing.T) {
 }
 
 func TestProc(t *testing.T) {
-	f := func(i int) error { return io.EOF }
-	s := func(i int) error { return nil }
+	f := func(_ int) error { return io.EOF }
+	s := func(_ int) error { return nil }
 
 	require.Equal(t, try.Failure[int](http.ErrMissingFile), try.Failure[int](http.ErrMissingFile).Proc(f))
 	require.Equal(t, try.Failure[int](http.ErrMissingFile), try.Failure[int](http.ErrMissingFile).Proc(s))
@@ -80,7 +80,7 @@ func TestProc(t *testing.T) {
 
 func TestProcFailure(t *testing.T) {
 	cnt := 0
-	f := func(e error) { cnt++ }
+	f := func(_ error) { cnt++ }
 
 	try.Success(1).ProcFailure(f)
 	require.Equal(t, 0, cnt)
