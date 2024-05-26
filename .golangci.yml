@@ -41,12 +41,12 @@ linters:
     - gocyclo
     - godot
     - godox
-    - err113
+    - goerr113
     - gofmt
     - gofumpt
     - goheader
     - goimports
-    - mnd
+    - gomnd
     - gomoddirectives
     - gomodguard
     - goprintffuncname
