@@ -41,7 +41,8 @@ jobs:
           sudo mv golangci-lint-$GOLANGCI_LINT_VERSION-linux-amd64/golangci-lint /usr/local/bin/golangci-lint
           rm -rf golangci-lint-$GOLANGCI_LINT_VERSION-linux-amd64*
         env:
-          GOLANGCI_LINT_VERSION: '1.50.1'
-          GOLANGCI_LINT_SHA256: '4ba1dc9dbdf05b7bdc6f0e04bdfe6f63aa70576f51817be1b2540bbce017b69a'
+          GOLANGCI_LINT_VERSION: '1.59.0'
+          GOLANGCI_LINT_SHA256: '0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5'
       - name: Lint
         run: make lint
+
