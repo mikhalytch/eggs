@@ -55,3 +55,19 @@ func ToMapWithKeys[K comparable, V any](keyProducer func(V) K) funcs.Applier[[]V
 		return res
 	}
 }
+
+func ToMultimapWithKeys[K comparable, V any](keyProducer func(V) K) funcs.Applier[[]V, map[K][]V] {
+	return func(vs []V) map[K][]V {
+		res := make(map[K][]V, 0)
+
+		for _, v := range vs {
+			key := keyProducer(v)
+
+			ex := res[key]
+			ex = append(ex, v)
+			res[key] = ex
+		}
+
+		return res
+	}
+}

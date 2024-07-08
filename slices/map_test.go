@@ -55,3 +55,15 @@ func TestToMapWithKeys(t *testing.T) {
 	require.Equal(t, map[string]int{"a": 0, "b": 1},
 		slices.ToMapWithKeys(func(v int) string { return string([]byte{byte(v + 'a')}) })([]int{0, 1}))
 }
+
+func TestToMultimapWithKeys(t *testing.T) {
+	require.Empty(t, slices.ToMultimapWithKeys(func(_ int) string { return "" })([]int{}))
+	require.Empty(t, slices.ToMultimapWithKeys(func(_ int) string { return "" })(nil))
+
+	require.Equal(t,
+		map[string][]int{"1": {1}},
+		slices.ToMultimapWithKeys(strconv.StoA[int])([]int{1}))
+	require.Equal(t,
+		map[string][]int{"1": {1, 1}, "2": {2, 2, 2}},
+		slices.ToMultimapWithKeys(strconv.StoA[int])([]int{1, 2, 2, 2, 1}))
+}
